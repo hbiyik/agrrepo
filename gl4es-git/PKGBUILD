@@ -21,7 +21,7 @@ prepare() {
   if [[ ${CARCH} != 'x86_64' ]]; then
     _cmake_opts+=('-DODROID=1')
   fi
-  mkdir build
+  mkdir -p build
   cmake -S gl4es -B build "${_cmake_opts[@]}"
 }
 

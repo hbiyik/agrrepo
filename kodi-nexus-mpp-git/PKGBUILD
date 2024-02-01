@@ -1,31 +1,11 @@
 # vim:set ts=2 sw=2 et:
-# Maintainer: Faruk Dikcizgi <boogiepop@gmx.de>
-# Contributor: graysky <therealgraysky AT protonmail DOT com>
-# Contributor: BlackIkeEagle < ike DOT devolder AT gmail DOT com >
-# Contributor: Sergej Pupykin <pupykin.s+arch@gmail.com>
-# Contributor: DonVla <donvla@users.sourceforge.net>
-# Contributor: Ulf Winkelvos <ulf [at] winkelvos [dot] de>
-# Contributor: Ralf Barth <archlinux dot org at haggy dot org>
-# Contributor: B & monty - Thanks for your hints :)
-# Contributor: marzoul
-# Contributor: Sergej Pupykin <pupykin.s+arch@gmail.com>
-# Contributor: Brad Fanella <bradfanella@archlinux.us>
-# Contributor: [vEX] <niechift.dot.vex.at.gmail.dot.com>
-# Contributor: Zeqadious <zeqadious.at.gmail.dot.com>
-# Contributor: Bartłomiej Piotrowski <bpiotrowski@archlinux.org>
-# Contributor: Maxime Gauduin <alucryd@gmail.com>
+# Maintainer boogieeeee <boogiepop AT gmx DOT com>
 #
-# Original credits go to Edgar Hucek <gimli at dark-green dot com>
-# for his xbmc-vdpau-vdr PKGBUILD at https://archvdr.svn.sourceforge.net/svnroot/archvdr/trunk/archvdr/xbmc-vdpau-vdr/PKGBUILD
-
-# set this to anything to build with clang rather than with gcc
-_clangbuild=
-
 pkgbase=kodi-nexus-mpp-git
-pkgname=("$pkgbase" "$pkgbase-eventclients" "$pkgbase-tools-texturepacker" "$pkgbase-dev" "$pkgbase-ffmpegdirect")
-pkgver=r62660.460db89710.0978cfe
+pkgname=("$pkgbase" ${pkgbase%"-mpp-git"}-binary-addons-git)
+pkgver=r64933.870e8cc757
 pkgrel=1
-arch=('aarch64' 'arm7f')
+arch=('arm7f' 'aarch64')
 url="https://kodi.tv"
 license=('GPL2')
 makedepends=(
@@ -42,27 +22,17 @@ makedepends=(
   # gbm
   'libinput' 'flatbuffers'
   # mpp
-  'mpp-git' 'librga-multi'
+  'mpp-git' 'mold'
 )
-options=(!lto strip !ccache)
 
-[[ -n "$_clangbuild" ]] && makedepends+=('clang' 'lld' 'llvm')
+# keep lto on for binary addons to link properly
+options=(lto strip)
 
 _gitname=xbmc
-_gitnameff='inputstream.ffmpegdirect'
 _codename=Nexus
+_codename_addon=Nexus
+_ff_branch="5.1.2"
 
-# Found on their respective github release pages. One can check them against
-# what is pulled down when not specifying them in the cmake step.
-# $CHROOT/build/kodi-git/src/kodi-build/build/download
-#
-# https://github.com/xbmc/FFmpeg/tags
-# https://github.com/xbmc/libdvdcss/tags
-# https://github.com/xbmc/libdvdnav/tags
-# https://github.com/xbmc/libdvdread/tags
-#
-# fmt and crossguid can be found https://mirrors.kodi.tv/build-deps/sources/
-#
 _libdvdcss_version="1.4.3-Next-Nexus-Alpha2-2"
 _libdvdnav_version="6.1.1-Next-Nexus-Alpha2-2"
 _libdvdread_version="6.1.3-Next-Nexus-Alpha2-2"
@@ -72,29 +42,202 @@ _spdlog_version="1.10.0"
 _crossguid_version="ca1bf4b810e2d188d04cb6286f957008ee1b7681"
 _fstrcmp_version="0.7.D001"
 _libudfread_version="1.1.2"
+
+_cmake_release_type=Release
+
+_addons=(
+  audiodecoder.2sf
+  audiodecoder.asap
+  audiodecoder.gme
+  audiodecoder.gsf
+  audiodecoder.hvl
+  audiodecoder.modplug
+  audiodecoder.ncsf
+  audiodecoder.nosefart
+  audiodecoder.openmpt
+  audiodecoder.organya
+  audiodecoder.qsf
+  audiodecoder.sacd
+  audiodecoder.sidplay
+  audiodecoder.snesapu
+  audiodecoder.ssf
+  audiodecoder.stsound
+  audiodecoder.timidity
+  audiodecoder.upse
+  audiodecoder.usf
+  audiodecoder.vgmstream
+  audiodecoder.wsr
+  audioencoder.flac
+  audioencoder.lame
+  audioencoder.vorbis
+  audioencoder.wav
+  game.libretro.2048
+  game.libretro
+  imagedecoder.heif
+  imagedecoder.mpo
+  imagedecoder.raw
+  inputstream.adaptive
+  inputstream.ffmpegdirect
+  inputstream.rtmp
+  peripheral.joystick
+  peripheral.xarcade
+  pvr.argustv
+  pvr.dvblink
+  pvr.dvbviewer
+  pvr.filmon
+  pvr.freebox
+  pvr.hdhomerun
+  pvr.hts
+  pvr.iptvsimple
+  pvr.mediaportal.tvserver
+  pvr.mythtv
+  pvr.nextpvr
+  pvr.njoy
+  pvr.octonet
+  pvr.pctv
+  pvr.plutotv
+  pvr.sledovanitv.cz
+  pvr.stalker
+  pvr.teleboy
+  pvr.vbox
+  pvr.vdr.vnsi
+  pvr.vuplus
+  pvr.waipu
+  pvr.wmc
+  pvr.zattoo
+  screensaver.asteroids
+  screensaver.asterwave
+  screensaver.biogenesis
+  screensaver.cpblobs
+  screensaver.greynetic
+  screensaver.matrixtrails
+  screensaver.pingpong
+  screensaver.pyro
+  screensaver.shadertoy
+  screensaver.stars
+  screensavers.rsxs
+  vfs.libarchive
+  vfs.rar
+  vfs.sftp
+  vfs.smb2
+  visualization.fishbmc
+  visualization.goom
+  visualization.milkdrop
+  visualization.milkdrop2
+  visualization.pictureit
+  visualization.projectm
+  visualization.shadertoy
+  visualization.spectrum
+  visualization.starburst
+  visualization.waveform
+)
+
+# checkout individual binary addons and ffmpeg
 source=(
-  "git+https://github.com/xbmc/xbmc.git#branch=$_codename"
-  "git+https://github.com/xbmc/inputstream.ffmpegdirect.git#branch=$_codename"
-  "git+https://github.com/xbmc/repo-binary-addons.git#branch=$_codename"
+  "git+https://github.com/xbmc/xbmc.git#branch=${_codename}"
+  "git+https://github.com/hbiyik/ffmpeg-rockchip.git#branch=${_ff_branch}"
+  "git+https://github.com/xbmc/audiodecoder.2sf#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/audiodecoder.asap#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/audiodecoder.gme#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/audiodecoder.gsf#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/audiodecoder.hvl#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/audiodecoder.modplug#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/audiodecoder.ncsf#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/audiodecoder.nosefart#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/audiodecoder.openmpt#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/audiodecoder.organya#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/audiodecoder.qsf#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/audiodecoder.sacd#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/audiodecoder.sidplay#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/audiodecoder.snesapu#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/audiodecoder.ssf#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/audiodecoder.stsound#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/audiodecoder.timidity#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/audiodecoder.upse#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/audiodecoder.usf#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/audiodecoder.vgmstream#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/audiodecoder.wsr#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/audioencoder.flac#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/audioencoder.lame#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/audioencoder.vorbis#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/audioencoder.wav#branch=${_codename_addon}"
+  "git+https://github.com/kodi-game/game.libretro.2048#branch=master"
+  "git+https://github.com/kodi-game/game.libretro#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/imagedecoder.heif#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/imagedecoder.mpo#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/imagedecoder.raw#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/inputstream.adaptive#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/inputstream.ffmpegdirect#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/inputstream.rtmp#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/peripheral.joystick#branch=${_codename_addon}"
+  "git+https://github.com/kodi-game/peripheral.xarcade#branch=${_codename_addon}"
+  "git+https://github.com/kodi-pvr/pvr.argustv#branch=${_codename_addon}"
+  "git+https://github.com/kodi-pvr/pvr.dvblink#branch=${_codename_addon}"
+  "git+https://github.com/kodi-pvr/pvr.dvbviewer#branch=${_codename_addon}"
+  "git+https://github.com/kodi-pvr/pvr.filmon#branch=${_codename_addon}"
+  "git+https://github.com/aassif/pvr.freebox#branch=${_codename_addon}"
+  "git+https://github.com/kodi-pvr/pvr.hdhomerun#branch=${_codename_addon}"
+  "git+https://github.com/kodi-pvr/pvr.hts#branch=${_codename_addon}"
+  "git+https://github.com/kodi-pvr/pvr.iptvsimple#branch=${_codename_addon}"
+  "git+https://github.com/kodi-pvr/pvr.mediaportal.tvserver#branch=${_codename_addon}"
+  "git+https://github.com/janbar/pvr.mythtv#branch=${_codename_addon}"
+  "git+https://github.com/kodi-pvr/pvr.nextpvr#branch=${_codename_addon}"
+  "git+https://github.com/kodi-pvr/pvr.njoy#branch=${_codename_addon}"
+  "git+https://github.com/DigitalDevices/pvr.octonet#branch=${_codename_addon}"
+  "git+https://github.com/kodi-pvr/pvr.pctv#branch=${_codename_addon}"
+  "git+https://github.com/kodi-pvr/pvr.plutotv#branch=${_codename_addon}"
+  "git+https://github.com/palinek/pvr.sledovanitv.cz#branch=${_codename_addon}"
+  "git+https://github.com/kodi-pvr/pvr.stalker#branch=${_codename_addon}"
+  "git+https://github.com/rbuehlma/pvr.teleboy#branch=${_codename_addon}"
+  "git+https://github.com/kodi-pvr/pvr.vbox#branch=${_codename_addon}"
+  "git+https://github.com/kodi-pvr/pvr.vdr.vnsi#branch=${_codename_addon}"
+  "git+https://github.com/kodi-pvr/pvr.vuplus#branch=${_codename_addon}"
+  "git+https://github.com/flubshi/pvr.waipu#branch=${_codename_addon}"
+  "git+https://github.com/kodi-pvr/pvr.wmc#branch=${_codename_addon}"
+  "git+https://github.com/rbuehlma/pvr.zattoo#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/screensaver.asteroids#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/screensaver.asterwave#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/screensaver.biogenesis#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/screensaver.cpblobs#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/screensaver.greynetic#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/screensaver.matrixtrails#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/screensaver.pingpong#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/screensaver.pyro#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/screensaver.shadertoy#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/screensaver.stars#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/screensavers.rsxs#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/vfs.libarchive#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/vfs.rar#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/vfs.sftp#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/vfs.smb2#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/visualization.fishbmc#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/visualization.goom#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/visualization.matrix#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/visualization.milkdrop#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/visualization.milkdrop2#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/visualization.pictureit#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/visualization.projectm#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/visualization.shadertoy#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/visualization.spectrum#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/visualization.starburst#branch=${_codename_addon}"
+  "git+https://github.com/xbmc/visualization.waveform#branch=${_codename_addon}"
   "libdvdcss-$_libdvdcss_version.tar.gz::https://github.com/xbmc/libdvdcss/archive/$_libdvdcss_version.tar.gz"
   "libdvdnav-$_libdvdnav_version.tar.gz::https://github.com/xbmc/libdvdnav/archive/$_libdvdnav_version.tar.gz"
   "libdvdread-$_libdvdread_version.tar.gz::https://github.com/xbmc/libdvdread/archive/$_libdvdread_version.tar.gz"
-  "ffmpeg-$_ffmpeg_version.tar.gz::https://github.com/xbmc/FFmpeg/archive/$_ffmpeg_version.tar.gz"
   "https://mirrors.kodi.tv/build-deps/sources/fmt-$_fmt_version.tar.gz"
   "https://mirrors.kodi.tv/build-deps/sources/spdlog-$_spdlog_version.tar.gz"
   "https://mirrors.kodi.tv/build-deps/sources/crossguid-$_crossguid_version.tar.gz"
   "https://mirrors.kodi.tv/build-deps/sources/fstrcmp-$_fstrcmp_version.tar.gz"
   "https://mirrors.kodi.tv/build-deps/sources/libudfread-$_libudfread_version.tar.gz"
-  0001-ffmpeg-buildsys.patch
-  0002-rkmpp-4.patch
-  0003-ffmpegdirect-buildsys.patch
+  "0001-ffmpeg-buildsys.patch"
+  "0002-PR21248.patch"
+  "0003-PR24431.patch"
 )
 
 noextract=(
   "libdvdcss-$_libdvdcss_version.tar.gz"
   "libdvdnav-$_libdvdnav_version.tar.gz"
   "libdvdread-$_libdvdread_version.tar.gz"
-  "ffmpeg-$_ffmpeg_version.tar.gz"
   "fmt-$_fmt_version.tar.gz"
   "spdlog-$_spdlog_version.tar.gz"
   "crossguid-$_crossguid_version.tar.gz"
@@ -105,60 +248,142 @@ noextract=(
 b2sums=('SKIP'
         'SKIP'
         'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
+        'SKIP'
         '2f503d3ab767094958f7ec10b4ad11ffd02665deee571c8f3c739bef5fc7e2ff84babc5a3fdee638dc095f896b72fe3ce65e6b688674cb5f7b7b77190992688c'
         'db4d05836d8fbb3637ae50bdbfc0e4b612ee6b3be24addfea94ce772c3bf28d58b63a3f252d6f9f016f72f8cbb841cc1820b091226b136f4c4664385a32da73c'
         'c94feb5a03a12efa5b7767965118d2500a088299ea36f3b82e46d157e45893e6b04503cb50f179ca681bac914457607fab26acfa6e304752b355c407578572d1'
-        '51d310e7000aeba657d55341c5fdb540474e197b85062228ab4b314c8309ec11985aa7f105193333fc6106529e8e58c86eafe268190894be8532d0e0b9065fa6'
         'ff1daa43140615b63aeb1ecd0aa1c32d24decfd5006805080293ef3db04d544c0445a30e8da0d985a6f5a25ad48ce4f6ae61e52da5ea4a4d3b031c212da38b18'
         'e40afa9fd1dd791e1f703392f0f54fc798ed70537a9f1ee9c8598dd449f4cd4dd03bc4ce95e416cbbe224711a17e70708a106f0432384542d6316cf232cf8757'
         '0f78a8ab5a420297f666b3b8156d499a9141ec25c049d4d2bb2ba594dc585abe211a149b83c605cce4f5530207231a065d5f3a87a0c969781de8c6381afa2527'
         'a8b68fcb8613f0d30e5ff7b862b37408472162585ca71cdff328e3299ff50476fd265467bbd77b352b22bb88c590969044f74d91c5468475504568fd269fa69e'
         '1801d84a0ca38410a78f23e7d44f37e6d53346753c853df2e7380d259ce1ae7f0c712825b95a5753ad0bc6360cfffe1888b9e7bc30da8b84549e0f1198248f61'
-        'a4c52a1efe8957c2d941a47caeb1b3ec86741d902ae2c58eff4aaba369475e72257bf63c43a1b5f55fc8d07bb2d0c5ea0b7717a028278eae6a34f5a91eb5047f'
-        '80a1ad491bd89b4d90a91372117a37abee040f8bf606fa6662dda2d99cdbb0e78a6be8b79dcd315a6bbd0b6efa42d0d39a30270f073eaaed16892a1cf6c1965f'
-        '943d358b4c127b77a691886a48245604081e3fdb5f05cd9a9821b52acf46bc6736089348f3299e00f35bbc09ba501d136088d96c7f118b3f5f3fe1cb7d77c7fd')
+        'fbfdab0ec7aaa056c900c5cdd4652a165ea22585923a01ae132ff306f2203d8a18b5472fc56d53706aaaccae1e6e613e886c6ed5400a64a34e333547b732032e'
+        'aa5ed3dd70277f4f87b73cef016ff9507a738fa0171efeaf8fe72f84287869ac2c0391cfbf202f44b76d1749016797b5a2de2ac96df6df73cf3837e7edb39911'
+        '83d77e51f159ab4a3834a8389f84fb5ec17792e94122162722f150ffce1d8dd7ca8f16b1782c7dfa49ecd9f2bc6739e61c066917972e99f87f19c3f798e90572')
 
 pkgver() {
-  cd "$_gitname"
-  local _kcommits="$(git rev-list --count HEAD)"
-  local _kcommit="$(git rev-parse --short HEAD)"
-  cd "../$_gitnameff"
-  local _ffcommits="$(git rev-list --count HEAD)"
-  local _ffcommit="$(git rev-parse --short HEAD)"
-  local _revnum=$(($_kcommits + $_ffcommits))
-  printf "r${_revnum}.${_kcommit}.${_ffcommit}"
+  local _revnum=0
+  local _acommits=0
+  local _fcommits=0
+  local _kcommits=0
+
+  for _addon in "${_addons[@]}"
+  do :
+  	cd "${srcdir}/${_addon}"
+    _acommits=$(($_acommits + "$(git rev-list --count HEAD)"))
+  done
+
+  cd "${srcdir}/ffmpeg-rockchip"
+  _fcommits="$(git rev-list --count HEAD)"
+  
+  cd "${srcdir}/${_gitname}"
+  _kcommits="$(git rev-list --count HEAD)"
+
+  _revnum=$(($_kcommits + $_acommits + $_fcommits))
+  printf "r%s.%s" $_revnum "$(git rev-parse --short HEAD)"
 }
 
 prepare() {
-  # use our local source, no network access should be allowed during build()
-  sed -i "s|https://github.com/xbmc/repo-binary-addons.git $_codename|file://${srcdir}/repo-binary-addons/.git makepkg|" xbmc/cmake/addons/bootstrap/repositories/binary-addons.txt
-  [[ -d kodi-build ]] && rm -rf kodi-build
   mkdir -p "$srcdir/kodi-build"
-  [[ -d ffdirect-build ]] && rm -rf ffdirect-build
-  mkdir -p "$srcdir/ffdirect-build"
-  # when built with debug enabled LTO needs more than 2gb size which larger than /tmp ond efault arch
-  # we are creating a temporary tmp folder to satisfy LTO, otherwise linking stage will fail
+  mkdir -p "$srcdir/addon-build"
   mkdir -p "$srcdir/tmp"
 
   cd "$_gitname"
-  patch -p1 -N -i ../0001-ffmpeg-buildsys.patch 
-  cp ../0002-rkmpp-4.patch tools/depends/target/ffmpeg
-  
-  cd ../"$_gitnameff"
-  patch -p1 -N -i ../0003-ffmpegdirect-buildsys.patch 
-  rm -rf depends/common/ffmpeg
-
-  if [[ -n "$_clangbuild" ]]; then
-    msg "Building with clang"
-    export CC=clang CXX=clang++
-  fi
+  rm -rf system/certs # remove not needed cacert
+  patch -p1 -N -i ../0001-ffmpeg-buildsys.patch
+  patch -p1 -N -i ../0002-PR21248.patch
+  patch -p1 -N -i ../0003-PR24431.patch
 }
 
 build() {
   cd "$srcdir/kodi-build"
 
   _args=(
-    -DCMAKE_BUILD_TYPE=Release
+    -DCMAKE_BUILD_TYPE=$_cmake_release_type
+    -DENABLE_DEBUGFISSION=OFF
     -DCMAKE_INSTALL_PREFIX=/usr
     -DCMAKE_INSTALL_LIBDIR=/usr/lib
     -DUSE_LTO=$(nproc)
@@ -177,7 +402,7 @@ build() {
     -Dlibdvdcss_URL="$srcdir/libdvdcss-$_libdvdcss_version.tar.gz"
     -Dlibdvdnav_URL="$srcdir/libdvdnav-$_libdvdnav_version.tar.gz"
     -Dlibdvdread_URL="$srcdir/libdvdread-$_libdvdread_version.tar.gz"
-    -DFFMPEG_URL="$srcdir/ffmpeg-$_ffmpeg_version.tar.gz"
+    -DFFMPEG_URL="${srcdir}/ffmpeg-rockchip"
     -DFMT_URL="$srcdir/fmt-$_fmt_version.tar.gz"
     -DSPDLOG_URL="$srcdir/spdlog-$_spdlog_version.tar.gz"
     -DCROSSGUID_URL="$srcdir/crossguid-$_crossguid_version.tar.gz"
@@ -187,27 +412,34 @@ build() {
   )
 
   # https://github.com/google/flatbuffers/issues/7404
-  CXXFLAGS+=' -Wno-error=restrict'
+  CXXFLAGS+=' -Wno-error=restrict -g3'
 
   echo "building kodi"
   cmake "${_args[@]}" ../"$_gitname"
-  TMPDIR="$srcdir/tmp" make -j$(nproc)
+  TMPDIR="$srcdir/tmp" make ${MAKEFLAGS}
   
-  cd "$srcdir/ffdirect-build"
-  echo "building ffmpeg-direct"
-  cmake -DCMAKE_INSTALL_PREFIX=/usr \
-        -DCMAKE_INSTALL_LIBDIR=/usr/lib/kodi \
-        -DCMAKE_BUILD_TYPE=Release \
-	    -DADDONS_TO_BUILD=$_gitnameff \
-	    -DADDON_SRC_PREFIX="../$_gitnameff/.." \
-	    "../$_gitname/cmake/addons"
-  FFMPEG_PATH=$srcdir/kodi-build/build make -j$(nproc) 
+  echo "Building Addons"
+  mkdir -p "$srcdir/addon-build/addons"
+
+  for _addon in "${_addons[@]}"
+  do : 
+    echo "Building $_addon"
+    mkdir -p "$srcdir/addon-build/$_addon"
+    cd "$srcdir/addon-build/$_addon"
+    TMPDIR="$srcdir/tmp" cmake \
+      -DADDONS_TO_BUILD=$_addon \
+      -DADDON_SRC_PREFIX=$srcdir \
+      -DCMAKE_BUILD_TYPE=$_cmake_release_type \
+      -DCMAKE_INSTALL_PREFIX="$srcdir/addon-build/addons" \
+      -DPACKAGE_ZIP=1 \
+      "$srcdir/xbmc/cmake/addons"
+    # in case some binary addon fails to build just ignore and build the next one
+    make ${MAKEFLAGS} || true
+  done
 }
 
-# kodi
-# components: kodi
 package_kodi-nexus-mpp-git() {
-  pkgdesc="A software media player and entertainment hub for digital media (Nexus branch) with Rockchip MPP hardware acceleration"
+  pkgdesc="A software media player and entertainment hub for digital media (${_codename})"
   depends=(
     'bluez-libs' 'curl' 'dav1d' 'desktop-file-utils' 'hicolor-icon-theme'
     'lcms2' 'libass' 'libbluray' 'libcdio' 'libcec' 'libmicrohttpd' 'libnfs'
@@ -215,110 +447,65 @@ package_kodi-nexus-mpp-git() {
     'mesa' 'python-pillow' 'python-pycryptodomex' 'python-simplejson'
     'shairplay' 'smbclient' 'sqlite' 'taglib' 'tinyxml'
     'libxrandr' 'libxkbcommon' 'waylandpp' 'libinput'
-    'pcre' 'flatbuffers' 'mpp-git' 'librga-multi'
+    'pcre' 'flatbuffers' 'mpp-git'
   )
-  [[ -n "$_clangbuild" ]] && depends+=('glu')
 
   optdepends=(
     'afpfs-ng: Apple shares support'
     'bluez: Blutooth support'
     'python-pybluez: Bluetooth support'
     'pulseaudio: PulseAudio support'
+    'pipewire: PipeWire support'
     'upower: Display battery level'
   )
-  provides=("kodi=${pkgver}" 'kodi-x11' 'kodi-wayland' 'kodi-gbm')
-  conflicts=('kodi' 'kodi-x11' 'kodi-wayland' 'kodi-gbm')
+  provides=("kodi=${pkgver}" 'kodi-nexus-full')
+  conflicts=('kodi')
 
   _components=(
     'kodi'
     'kodi-bin'
+    'kodi-eventclients-common'
+    'kodi-eventclients-ps3'
+    'kodi-eventclients-kodi-send'
+    'kodi-tools-texturepacker'
+    'kodi-addon-dev'
+    'kodi-eventclients-dev'
   )
 
+  echo "Installing Kodi"
   cd kodi-build
   for _cmp in ${_components[@]}; do
   DESTDIR="$pkgdir" /usr/bin/cmake \
     -DCMAKE_INSTALL_COMPONENT="$_cmp" \
      -P cmake_install.cmake
   done
-  
-  # avoid error <general>: GetDirectory - Error getting /usr/lib/kodi/addons
-  mkdir -p "$pkgdir"/usr/lib/kodi/addons
 }
 
-# kodi-eventclients
-# components: kodi-eventclients-common kodi-eventclients-ps3 kodi-eventclients-kodi-send
-package_kodi-nexus-mpp-git-eventclients() {
-  pkgdesc="Kodi Event Clients (Nexus branch)"
-  provides=("kodi-eventclients=${pkgver}")
-  conflicts=('kodi-eventclients')
-  optdepends=(
-    'kodi: local machine eventclient use'
-    'python: most eventclients are implemented in python'
-  )
-
-  _components=(
-    'kodi-eventclients-common'
-    'kodi-eventclients-ps3'
-    'kodi-eventclients-kodi-send'
-  )
-
-  cd kodi-build
-  for _cmp in ${_components[@]}; do
-    DESTDIR="$pkgdir" /usr/bin/cmake \
-      -DCMAKE_INSTALL_COMPONENT="$_cmp" \
-      -P cmake_install.cmake
-  done
+_install_binary_addon() {
+  if [ -d $2 ]; then
+    echo "Installing $1"
+  	mkdir -p $3
+  	cp -rf $2/* $3/
+  else
+   echo "Skipping $1"
+  fi
 }
 
-# kodi-tools-texturepacker
-# components: kodi-tools-texturepacker
-package_kodi-nexus-mpp-git-tools-texturepacker() {
-  pkgdesc="Kodi Texturepacker tool (Nexus branch)"
-  provides=("kodi-tools-texturepacker=${pkgver}")
-  conflicts=('kodi-tools-texturepacker')
-  depends=('libpng' 'giflib' 'libjpeg-turbo' 'lzo')
+package_kodi-nexus-binary-addons-git() {
+  pkgdesc="All Kodi ${_codename} binary addons "
+  depends=('kodi-nexus-full')
+  provides=("kodi-nexus-binary-addons=${pkgver}")
 
-  _components=(
-    'kodi-tools-texturepacker'
-  )
-
-  cd kodi-build
-  for _cmp in ${_components[@]}; do
-    DESTDIR="$pkgdir" /usr/bin/cmake \
-      -DCMAKE_INSTALL_COMPONENT="$_cmp" \
-      -P cmake_install.cmake
-  done
-}
-
-package_kodi-nexus-mpp-git-ffmpegdirect() {
-  pkgdesc="Inputstream ffmpegdirect kodi binary addon (Nexus branch) supporting Rockchip MPP hardware acceleration"
-  provides=('kodi-addon-inputstream-ffmpegdirect')
-  conflicts=('kodi-addon-inputstream-ffmpegdirect')
-  depends=('kodi' 'kodi-nexus-mpp-git')
-  
-  cd "$srcdir/ffdirect-build"
-  install -d "${pkgdir}/usr"
-  mv .install/lib "${pkgdir}/usr/"
-  mv .install/share "${pkgdir}/usr/"
-}
-
-# kodi-dev
-# components: kodi-addon-dev kodi-eventclients-dev
-package_kodi-nexus-mpp-git-dev() {
-  pkgdesc="Kodi dev files (Nexus branch) with Rockchip MPP hardware acceleration"
-  depends=('kodi-nexus-mpp-git')
-  provides=("kodi-nexus-dev=${pkgver}" "kodi-dev=${pkgver}")
-  conflicts=('kodi-nexus-dev' "kodi-dev")
-
-  _components=(
-    'kodi-addon-dev'
-    'kodi-eventclients-dev'
-  )
-
-  cd kodi-build
-  for _cmp in ${_components[@]}; do
-    DESTDIR="$pkgdir" /usr/bin/cmake \
-      -DCMAKE_INSTALL_COMPONENT="$_cmp" \
-      -P cmake_install.cmake
+  cd $srcdir/addon-build/addons
+  for _addon in "${_addons[@]}"
+  do :
+  	if [ $_addon = "screensavers.rsxs" ]; then
+	  for _subaddon in $srcdir/addon-build/addons/screensaver.rsxs.*; do
+		_subaddon_name="$(basename ${_subaddon})"
+		_install_binary_addon $_subaddon_name $_subaddon "$pkgdir/usr/lib/kodi/addons/$_subaddon_name" 
+	  done
+  	else
+  	  _install_binary_addon $_addon $srcdir/addon-build/addons/$_addon "$pkgdir/usr/lib/kodi/addons/$_addon"
+	fi
   done
 }
