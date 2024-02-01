@@ -1,0 +1,23 @@
+pkgbase = gl4es-git
+	pkgdesc = OpenGL for GLES Hardware
+	pkgver = r2647.e39434a2
+	pkgrel = 1
+	url = https://github.com/ptitSeb/gl4es
+	arch = x86_64
+	arch = aarch64
+	arch = arm7h
+	license = MIT
+	makedepends = cmake
+	depends = coreutils
+	depends = libx11
+	options = !lto
+	options = debug
+	options = strip
+	source = git+https://github.com/ptitSeb/gl4es.git#branch=master
+	sha256sums = SKIP
+
+pkgname = gl4es-git
+	provides = gl4es
+	provides = gl4es-git
+	conflicts = gl4es
+	conflicts = gl4es-git

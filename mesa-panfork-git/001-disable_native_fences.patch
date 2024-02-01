@@ -1,0 +1,25 @@
+From 2b468ed6b1b59732c332ccb4bedb689c8520a21d Mon Sep 17 00:00:00 2001
+From: boogie <boogiepop@gmx.com>
+Date: Mon, 20 Nov 2023 22:48:56 +0100
+Subject: [PATCH] disable native fence fds, it is not supported
+
+---
+ src/gallium/drivers/panfrost/pan_screen.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/gallium/drivers/panfrost/pan_screen.c b/src/gallium/drivers/panfrost/pan_screen.c
+index ea315f8be64..39e578601ba 100644
+--- a/src/gallium/drivers/panfrost/pan_screen.c
++++ b/src/gallium/drivers/panfrost/pan_screen.c
+@@ -358,7 +358,7 @@ panfrost_get_param(struct pipe_screen *screen, enum pipe_cap param)
+                 return 1;
+ 
+         case PIPE_CAP_NATIVE_FENCE_FD:
+-                return 1;
++                return 0;
+ 
+         default:
+                 return u_pipe_screen_get_param_defaults(screen, param);
+-- 
+2.42.1
+

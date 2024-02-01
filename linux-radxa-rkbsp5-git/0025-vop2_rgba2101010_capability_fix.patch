@@ -1,0 +1,27 @@
+From dd8ba855bca010e281e3d69fb10c8a6600c4f541 Mon Sep 17 00:00:00 2001
+From: boogie <boogiepop@gmx.com>
+Date: Mon, 22 Jan 2024 12:00:42 +0100
+Subject: [PATCH] vop2 rbga2101010 capability fix
+
+---
+ drivers/gpu/drm/rockchip/rockchip_vop2_reg.c | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/drivers/gpu/drm/rockchip/rockchip_vop2_reg.c b/drivers/gpu/drm/rockchip/rockchip_vop2_reg.c
+index 31069d9aebf8..a12670e1c2e7 100644
+--- a/drivers/gpu/drm/rockchip/rockchip_vop2_reg.c
++++ b/drivers/gpu/drm/rockchip/rockchip_vop2_reg.c
+@@ -31,10 +31,6 @@
+ 		_VOP_REG(off, _mask, s, true)
+ 
+ static const uint32_t formats_for_cluster[] = {
+-	DRM_FORMAT_XRGB2101010,
+-	DRM_FORMAT_ARGB2101010,
+-	DRM_FORMAT_XBGR2101010,
+-	DRM_FORMAT_ABGR2101010,
+ 	DRM_FORMAT_XRGB8888,
+ 	DRM_FORMAT_ARGB8888,
+ 	DRM_FORMAT_XBGR8888,
+-- 
+2.43.0
+

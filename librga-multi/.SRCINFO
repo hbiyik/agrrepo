@@ -1,0 +1,24 @@
+pkgbase = librga-multi
+	pkgdesc = Rockchip RGA User-Space Library
+	pkgver = 1.9.3.1
+	pkgrel = 1
+	url = https://github.com/JeffyCN/mirrors/tree/linux-rga-multi
+	arch = aarch64
+	arch = armv7h
+	license = Apache
+	makedepends = meson
+	depends = gcc-libs
+	depends = meson
+	options = !lto
+	options = debug
+	options = strip
+	source = source.tar.gz
+	source = normalrga-cpp-add-10b-compact-endian-mode.patch
+	sha256sums = 1cbe37b5d67447aca73d72e66c17ca8342aa47daf74deefa0e5649d21b1c802c
+	sha256sums = 26f2990818d6b6412c7f1d57b27cacc3d3e30b7ffad1fd678b5d2d991f1f4c74
+
+pkgname = librga-multi
+	provides = librga-multi
+	conflicts = librga-multi
+	conflicts = rga
+	conflicts = librga

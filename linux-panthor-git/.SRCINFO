@@ -1,0 +1,27 @@
+pkgbase = linux-panthor-git
+	pkgdesc = Linux kernel package targeting to pretest 6.5x merges for panthor
+	pkgver = 6.5
+	pkgrel = 1
+	url = https://github.com/hbiyik
+	arch = aarch64
+	license = GPL2
+	makedepends = xmlto
+	makedepends = docbook-xsl
+	makedepends = kmod
+	makedepends = inetutils
+	makedepends = bc
+	makedepends = git
+	makedepends = uboot-tools
+	makedepends = vboot-utils
+	makedepends = dtc
+	options = !strip
+	source = git+https://github.com/hbiyik/linux.git#branch=panthor
+	source = linux.preset
+	source = extlinux.panthor.template
+	b2sums = SKIP
+	b2sums = bd296f775df973c6dcb6bd8311ce4d3af9a8d4a67905f17c450cae776aab0229987d473334d38fd102a34ed483a121f67ac58a48fd9e6fab2c714c7079e06613
+	b2sums = 60ef0a5252d57212b79158c42928d255f62dd8139a57bb66e013f101aa78a54976850edb30d07b72dfbd52cff5e739176c59172dbededf53c3499fb7a72d263b
+
+pkgname = linux-panthor-git-headers
+
+pkgname = linux-panthor-git

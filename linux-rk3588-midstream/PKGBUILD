@@ -1,0 +1,207 @@
+# AArch64 multi-platform
+# Maintainer: Mahmut Dikcizgi <boogiepop a~t gmx com>
+# Contributor: Kevin Mihelich <kevin@archlinuxarm.org>
+
+_pkgver=6.2
+_user="Googulator"
+_kernel=linux-rk3588-midstream
+pkgbase=$_kernel-git
+pkgname=("${pkgbase}-headers" $pkgbase)
+pkgver=$_pkgver
+pkgrel=1
+arch=('aarch64')
+license=('GPL2')
+url="https://github.com/${_user}"
+_kernelrepo=$_kernel 
+_kernelbranch="pancsf-midstream"
+pkgdesc="Latest git Linux kernel package for rk3588 mid-ported to mainline" 
+makedepends=('xmlto' 'docbook-xsl' 'kmod' 'inetutils' 'bc' 'git' 'uboot-tools' 'vboot-utils' 'dtc')
+options=('!strip')
+
+# Patch1-19 comes from Radxa: https://github.com/radxa-repo/bsp/tree/main/linux/rockchip
+# Patch20: Warning Supressions for buildsystem not to quit including DistCC builds
+# Patch21-25: icecream95's mesa speed patches from kernel 6.x https://gitlab.com/panfork/rk3588-implicit-sync
+# Patch22: Force Enabling AV1 decoder in 3588. This may be implemented in radxa git as well soon
+source=(git+https://github.com/$_user/$_kernelrepo.git#branch=$_kernelbranch
+		'linux.preset'
+		'extlinux.arch.template')
+b2sums=('SKIP'
+        'b5ebfe78b703b7d5ea31be16513ff4e91d0ca7f13657c6d09ff92ef4f1566bf501a4b536b7f48791055d0b327724ada23a3f5a34247c5effe3fe2ff7e1acd8eb'
+        '47ceb511b1631c55e8cd4ba840f34be4cfe3214194f23d9f71d7c5336f8f9ff9bc3fc8c052428cfc31f55bb25fb4565baf5eca791f341895f357d22e137c6e51')
+
+pkgver(){
+	cd $_kernel
+	local _kcommits="$(git rev-list --count HEAD)"
+	local _kcommit="$(git rev-parse --short HEAD)"
+	
+	local _version="${_kcommits}.${_kcommit}"
+	echo $_version > pkgver
+	printf $_version
+}
+
+prepare() {
+  cd $_kernel
+  for p in ../*.patch; do
+    echo "Patching with ${p}"
+    patch -p1 -N -i $p || true
+  done
+
+  # this is only for local builds so there is no need to integrity check
+  for p in ../../custom/*.patch; do
+    echo "Custom Patching with ${p}"
+    patch -p1 -N -i $p || true
+  done
+
+  if [ -f ../../custom/config ]; then
+    echo "Using User Specific Config"
+    cp -f ../../custom/config ./.config
+  else 
+    cp -f arch/arm64/configs/rockchip_linux_defconfig ./.config
+  fi
+
+  # fix distcc build which does not support gcc plugins
+  sed -i 's/CONFIG_GCC_PLUGINS=y/CONFIG_GCC_PLUGINS=n/g' .config
+}
+
+build() {
+  cd $_kernel
+
+  local _version="$(<pkgver)"
+  _version="${_version/"$_pkgver"/}"
+  _version="${_version//\./-}"
+  sed  -i "5s/.*/EXTRAVERSION = ${_version}/" Makefile
+  echo "-rk3588-midstream" > .scmversion
+  # should result in kernelmaj.kernelmin.patchver-totalcommitnum-hashofkernel-hashofoverlays-radxa-rkbsp
+ 
+  make -j$(nproc) olddefconfig prepare
+  make -s kernelrelease > version
+  unset LDFLAGS
+  make -j$(nproc) ${MAKEFLAGS} Image modules
+  make -j$(nproc) ${MAKEFLAGS} DTC_FLAGS="-@" dtbs
+}
+
+_package-git() {
+  pkgdesc="Latest git Linux kernel package for rk3588 mid-ported to mainline"
+  depends=('coreutils' 'kmod' 'mkinitcpio>=0.7')
+  optdepends=('wireless-regdb: to set the correct wireless channels of your country')
+  provides=("linux=${pkgver}" $_kernel)
+  conflicts=('linux' $_kernel)
+  backup=("etc/mkinitcpio.d/${_kernel}.preset")
+
+  cd $_kernel
+  
+  local _version="$(<version)"
+  
+  # install dtbs
+  make INSTALL_DTBS_PATH="${pkgdir}/boot/dtbs/$_kernel" dtbs_install
+
+  # install extlinux template
+  install -Dm644 ../extlinux.arch.template "$pkgdir/boot/extlinux/extlinux.arch.template"
+  
+  # install modules
+  make INSTALL_MOD_PATH="$pkgdir/usr" INSTALL_MOD_STRIP=1 modules_install
+
+  # copy kernel
+  install -Dm644 arch/arm64/boot/Image "$pkgdir/usr/lib/modules/$_version/vmlinuz"
+
+  # remove build and source links
+  rm "$pkgdir/usr/lib/modules/$_version"/{source,build}
+
+  # sed expression for following substitutions
+  local _subst="
+    s|%PKGBASE%|${_kernel}|g
+    s|%KERNVER%|${_version}|g
+  "
+
+  # used by mkinitcpio to name the kernel
+  echo "$_kernel" | install -Dm644 /dev/stdin "$pkgdir/usr/lib/modules/$_version/pkgbase"
+
+  # install mkinitcpio preset file
+  sed "$_subst" ../linux.preset |
+    install -Dm644 /dev/stdin "$pkgdir/etc/mkinitcpio.d/$_kernel.preset"
+}
+
+_package-git-headers() {
+  pkgdesc="Latest Git Linux kernel headers based on 5.10.x BSP published by RADXA targetting rk3399 based rock4 and rk3588 based rock5 boards"
+  provides=("linux-headers=${pkgver}" "$_kernel-headers")
+  conflicts=('linux-headers' "$_kernel-headers")
+
+  cd $_kernel
+  local _version="$(<version)"
+  local builddir="$pkgdir/usr/lib/modules/$_version/build"
+
+  echo "Installing build files..."
+  install -Dt "$builddir" -m644 .config Makefile Module.symvers System.map version
+  install -Dt "$builddir/kernel" -m644 kernel/Makefile
+  install -Dt "$builddir/arch/arm64" -m644 arch/arm64/Makefile
+  cp -t "$builddir" -a scripts
+
+  # add xfs and shmem for aufs building
+  mkdir -p "$builddir"/{fs/xfs,mm}
+
+  echo "Installing headers..."
+  cp -t "$builddir" -a include
+  cp -t "$builddir/arch/arm64" -a arch/arm64/include
+  install -Dt "$builddir/arch/arm64/kernel" -m644 arch/arm64/kernel/asm-offsets.s
+  mkdir -p "$builddir/arch/arm"
+  cp -t "$builddir/arch/arm" -a arch/arm/include
+
+  install -Dt "$builddir/drivers/md" -m644 drivers/md/*.h
+  install -Dt "$builddir/net/mac80211" -m644 net/mac80211/*.h
+
+  # https://bugs.archlinux.org/task/13146
+  install -Dt "$builddir/drivers/media/i2c" -m644 drivers/media/i2c/msp3400-driver.h
+
+  # https://bugs.archlinux.org/task/20402
+  install -Dt "$builddir/drivers/media/usb/dvb-usb" -m644 drivers/media/usb/dvb-usb/*.h
+  install -Dt "$builddir/drivers/media/dvb-frontends" -m644 drivers/media/dvb-frontends/*.h
+  install -Dt "$builddir/drivers/media/tuners" -m644 drivers/media/tuners/*.h
+
+  # https://bugs.archlinux.org/task/71392
+  install -Dt "$builddir/drivers/iio/common/hid-sensors" -m644 drivers/iio/common/hid-sensors/*.h
+
+  echo "Installing KConfig files..."
+  find . -name 'Kconfig*' -exec install -Dm644 {} "$builddir/{}" \;
+
+  echo "Removing unneeded architectures..."
+  local arch
+  for arch in "$builddir"/arch/*/; do
+    [[ $arch = */arm64/ || $arch == */arm/ ]] && continue
+    echo "Removing $(basename "$arch")"
+    rm -r "$arch"
+  done
+
+  echo "Removing documentation..."
+  rm -r "$builddir/Documentation"
+
+  echo "Removing broken symlinks..."
+  find -L "$builddir" -type l -printf 'Removing %P\n' -delete
+
+  echo "Removing loose objects..."
+  find "$builddir" -type f -name '*.o' -printf 'Removing %P\n' -delete
+
+  echo "Stripping build tools..."
+  local file
+  while read -rd '' file; do
+    case "$(file -bi "$file")" in
+      application/x-sharedlib\;*)      # Libraries (.so)
+        strip -v $STRIP_SHARED "$file" ;;
+      application/x-archive\;*)        # Libraries (.a)
+        strip -v $STRIP_STATIC "$file" ;;
+      application/x-executable\;*)     # Binaries
+        strip -v $STRIP_BINARIES "$file" ;;
+      application/x-pie-executable\;*) # Relocatable binaries
+        strip -v $STRIP_SHARED "$file" ;;
+    esac
+  done < <(find "$builddir" -type f -perm -u+x ! -name -print0)
+
+  echo "Adding symlink..."
+  mkdir -p "$pkgdir/usr/src"
+  ln -sr "$builddir" "$pkgdir/usr/src/$_kernel"
+}
+
+for _p in ${pkgname[@]}; do
+  eval "package_${_p}() {
+    _package${_p#${_kernel}}
+  }"
+done

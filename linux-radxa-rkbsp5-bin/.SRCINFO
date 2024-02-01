@@ -1,0 +1,47 @@
+pkgbase = linux-radxa-rkbsp5-bin
+	pkgdesc = Precompiled Linux kernel package based on 5.10.x BSP kernel published by RADXA targetting rk3399 based rock4 and rk3588 based rock5 boards
+	pkgver = 5.10.110.15.a2d3d7e5d
+	pkgrel = 1
+	url = https://github.com/radxa/kernel
+	arch = aarch64
+	license = GPL2
+	makedepends = binutils
+	makedepends = tar
+	makedepends = grep
+	makedepends = mkinitcpio
+	makedepends = sed
+	noextract = linux-rockchip.git#branch=main
+	noextract = linux.preset
+	noextract = extract-vmlinux
+	noextract = extlinux.arch.template
+	options = !strip
+	source = git+https://github.com/radxa-pkg/linux-rockchip.git#branch=main
+	source = linux.preset
+	source = extract-vmlinux
+	source = extlinux.arch.template
+	sha512sums = SKIP
+	sha512sums = 03cdaa19ff754c1b16cbfe8b08d38fed2f21c688a6e00d331ca53c4ef937c1cd3fdcfca2241d136238f220a87f3da04c1e6e192d262b4505f8bff3ddcbc8b9ad
+	sha512sums = ba6edcd5f56a4c3e865578eabf1e1311b8e5e7babffdb0f84b99971238505ca27eba506f2723638129ef6558eba95f7e4fd2e07b40e5a4de716e5de90d1cbe79
+	sha512sums = b09481badcc35acc5455b97545e87c706c5cb326e1b80237b2435d821c3c45002b44538095f3c5f3cfc720acf55bc27d97b0290e5cffa5acbdbaf0c2314f2d1b
+
+pkgname = linux-radxa-rkbsp5-bin
+	pkgdesc = Precompiled Linux kernel image based on 5.10.x BSP published by RADXA targetting rk3399 based rock4 and rk3588 based rock5 boards
+	depends = coreutils
+	depends = linux-firmware
+	depends = kmod
+	depends = mkinitcpio>=0.7
+	depends = grep
+	depends = gzip
+	depends = mali-valhall-g610-firmware
+	optdepends = crda: to set the correct wireless channels of your country
+	provides = linux=5.10.110.15.a2d3d7e5d
+	provides = linux-rkbsp
+	conflicts = linux
+	backup = etc/mkinitcpio.d/linux-radxa-rkbsp5.preset
+
+pkgname = linux-radxa-rkbsp5-bin-headers
+	pkgdesc = Precompiled Linux kernel headers based on 5.10.x BSP kernel published by RADXA targetting rk3399 based rock4 and rk3588 based rock5 boards
+	depends = python
+	provides = linux-headers=5.10.110.15.a2d3d7e5d
+	provides = linux-rkbsp-headers
+	conflicts = linux-headers

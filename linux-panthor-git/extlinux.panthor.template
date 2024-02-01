@@ -1,0 +1,10 @@
+#timeout 10
+#menu title select kernel
+
+label Archlinux
+    kernel /vmlinuz-linux-panthor
+    initrd /initramfs-linux-panthor.img
+    devicetreedir /dtbs/linux-panthor
+    fdtoverlays /dtbs/linux-panthor/rockchip/overlays/rk3588-uart7-m2.dtbo
+    append root=UUID=CHANGEME rootwait rootfstype=ext4 earlyprintk console=ttyS2,1500000 console=tty1 rw init=/sbin/init cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory swapaccount=1
+  
