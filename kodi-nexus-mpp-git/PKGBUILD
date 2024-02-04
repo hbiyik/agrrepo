@@ -15,7 +15,7 @@ makedepends=(
   'libmodplug' 'libmpeg2' 'libnfs' 'libplist' 'libpulse' 'libva'
   'libva-vdpau-driver' 'libxrandr' 'libxslt' 'lirc' 'lzo' 'mesa' 'nasm'
   'pcre' 'python-pycryptodomex' 'python-pillow' 'python-pybluez'
-  'python-simplejson' 'shairplay' 'smbclient' 'taglib' 'tinyxml' 'swig'
+  'python-simplejson' 'shairplay' 'smbclient' 'tinyxml' 'swig'
   'upower' 'giflib' 'ghostscript' 'meson' 'gtest' 'graphviz'
   # wayland
   'wayland-protocols' 'waylandpp' 'libxkbcommon'
@@ -396,6 +396,7 @@ build() {
     -DENABLE_INTERNAL_CROSSGUID=ON
     -DENABLE_INTERNAL_FSTRCMP=ON
     -DENABLE_INTERNAL_UDFREAD=ON
+    -DENABLE_INTERNAL_TAGLIB=ON
     -DENABLE_MYSQLCLIENT=ON
     -DENABLE_VAAPI=ON
     -DENABLE_VDPAU=ON
@@ -445,7 +446,7 @@ package_kodi-nexus-mpp-git() {
     'lcms2' 'libass' 'libbluray' 'libcdio' 'libcec' 'libmicrohttpd' 'libnfs'
     'libplist' 'libpulse' 'libva' 'libvdpau' 'libxslt' 'lirc' 'mariadb-libs'
     'mesa' 'python-pillow' 'python-pycryptodomex' 'python-simplejson'
-    'shairplay' 'smbclient' 'sqlite' 'taglib' 'tinyxml'
+    'shairplay' 'smbclient' 'sqlite' 'tinyxml'
     'libxrandr' 'libxkbcommon' 'waylandpp' 'libinput'
     'pcre' 'flatbuffers' 'mpp-git'
   )
