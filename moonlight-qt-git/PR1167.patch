@@ -1,0 +1,38 @@
+From 2e3cf89e1f971eccfe331fb6fa3405e9fd683e5c Mon Sep 17 00:00:00 2001
+From: boogie <boogiepop@gmx.com>
+Date: Sat, 27 Jan 2024 00:10:44 +0100
+Subject: [PATCH] Only give "pixel_format=nv12" option to v4l2m2m or
+ v4l2requests decoders
+
+pixel_format is a global option which changes avctx->pix_fmt to the
+given format, and overrides the AV_PIX_FMT_DRM_PRIME requirement of a
+decoder. So v4l2 out of tree patches has done some exception which is
+not perfectly nice, therefore limit this option only if the given
+decoder is v4l2 decoder. Otherwise rockchip mpp based ffmpeg decoders
+can not work properly
+---
+ app/streaming/video/ffmpeg-renderers/drm.cpp | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/app/streaming/video/ffmpeg-renderers/drm.cpp b/app/streaming/video/ffmpeg-renderers/drm.cpp
+index 786ac62c..15d575d4 100644
+--- a/app/streaming/video/ffmpeg-renderers/drm.cpp
++++ b/app/streaming/video/ffmpeg-renderers/drm.cpp
+@@ -4,6 +4,7 @@
+ #endif
+ 
+ #include "drm.h"
++#include "string.h"
+ 
+ extern "C" {
+     #include <libavutil/hwcontext_drm.h>
+@@ -157,7 +158,8 @@ bool DrmRenderer::prepareDecoderContext(AVCodecContext* context, AVDictionary**
+ {
+     // The out-of-tree LibreELEC patches use this option to control the type of the V4L2
+     // buffers that we get back. We only support NV12 buffers now.
+-    av_dict_set_int(options, "pixel_format", AV_PIX_FMT_NV12, 0);
++    if(strstr(context->codec->name, "_v4l2") != NULL)
++        av_dict_set_int(options, "pixel_format", AV_PIX_FMT_NV12, 0);
+ 
+     // This option controls the pixel format for the h264_omx and hevc_omx decoders
+     // used by the JH7110 multimedia stack. This decoder gives us software frames,
