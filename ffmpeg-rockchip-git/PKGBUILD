@@ -64,7 +64,7 @@ depends=(
   vid.stab
   libvorbisenc.so
   libvorbis.so
-  libvpx.so	
+  libvpx	
   libwebp
   libx11
   libx264.so
