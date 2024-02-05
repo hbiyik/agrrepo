@@ -39,42 +39,39 @@ depends=(
   gsm
   jack
   lame
-  libass.so
+  libass
   libavc1394
-  libbluray.so
-  libbs2b.so
+  libbluray
+  libbs2b
   dav1d
   libdrm
-  libfreetype.so
+  freetype2
   libgl
   libiec61883
   libjxl
   libmodplug
-  libopenmpt.so
+  libopenmpt
   libpulse
   libraw1394
-  librsvg-2.so
+  librsvg-2
   libsoxr
   libssh
   libtheora
-  libva.so
-  libva-drm.so
-  libva-x11.so
+  libva
   libvdpau
   vid.stab
-  libvorbisenc.so
-  libvorbis.so
+  libvorbis
   libvpx	
   libwebp
   libx11
-  libx264.so
-  libx265.so
+  x264
+  x265
   libxcb
   libxext
   libxml2
   libxv
-  libxvidcore.so
-  libzimg.so
+  xvidcore
+  zimg
   ocl-icd
   onevpl
   opencore-amr
