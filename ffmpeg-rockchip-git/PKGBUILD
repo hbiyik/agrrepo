@@ -53,7 +53,7 @@ depends=(
   libopenmpt
   libpulse
   libraw1394
-  librsvg-2
+  librsvg
   libsoxr
   libssh
   libtheora
