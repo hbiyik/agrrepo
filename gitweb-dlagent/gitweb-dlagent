@@ -1,0 +1,172 @@
+#!/usr/bin/python
+
+from urllib import parse
+from urllib import request
+import os
+import re
+import time
+import argparse
+
+FLAG_COMMIT = "commit"
+FLAG_CHECKSUM = "checksum"
+FLAG_REVISION = "revision"
+FRAG_BRANCH = "branch"
+FRAG_TAG = "tag"
+FRAG_COMMIT = "commit"
+DEF_REVPATTERN = "r{revision}.{commit:.10s}"
+RE_REV = r"commitCount(?:\"|\')\s*?\:\s*?(?:\"|\')(.+?)(?:\"|\')"
+RE_COMMIT = r"currentOid(?:\"|\')\s*?\:\s*?(?:\"|\')(.+?)(?:\"|\')"
+
+
+class GitwebException(Exception):
+    pass
+
+
+class Webgit:
+    name = ""
+    extension = ".tar.gz"
+    private = ".gitweb"
+
+    @classmethod
+    def check(cls, url):
+        try:
+            parsed = parse.urlparse(url)
+        except Exception:
+            raise(GitwebException(f"Unsupported url : %s" % url))
+        if cls.name not in parsed.netloc:
+            raise(GitwebException(f"Unsupported url : %s" % url))
+        return parsed
+
+    def __init__(self, commit, revision):
+        if not os.path.exists(self.private):
+            os.makedirs(self.private)
+        self.revision = revision
+        self.commit = commit
+        self._checksum = None
+        self.archive = os.path.join(self.private, self.repo) + self.extension
+        self.archiveurl = None
+
+    @property
+    def checksum(self):
+        # tar files have internal checksums, therefore checking the file size is enough
+        if not self._checksum and os.path.exists(self.archive):
+            self._checksum = str(os.stat(self.archive).st_size)
+        return self._checksum
+
+    def version(self, pattern=DEF_REVPATTERN):
+        return pattern.format(revision=self.revision, commit=self.commit)
+
+    def readflag(self, flag):
+        try:
+            with open(os.path.join(self.private, f"{self.repo}_{flag}"), "r") as f:
+                return f.read()
+        except Exception:
+            return
+
+    def writeflag(self, flag, data):
+        with open(os.path.join(self.private, f"{self.repo}_{flag}"), "wb") as f:
+            return f.write(data.encode())
+
+    def download(self):
+        if os.path.exists(self.archive):
+            os.remove(self.archive)
+        print(f"Downloading {self.archiveurl} > {self.archive}")
+        t1 = time.time()
+        request.urlretrieve(self.archiveurl, self.archive)
+        self.writeflag(FLAG_COMMIT, self.commit)
+        self.writeflag(FLAG_CHECKSUM, self.checksum)
+        self.writeflag(FLAG_REVISION, self.revision)
+        print(f"Downloaded in {(time.time() - t1):.2f} seconds")
+
+    def extract(self):
+        # is there a better way to get srcdir?
+        extractdir = os.path.join("src", self.repo)
+        if not os.path.exists(extractdir):
+            os.makedirs(extractdir)
+        os.system(f"rm -rf {extractdir}/*")
+        os.system(f"tar -I pigz --strip-components 1 -xf {self.archive} -C {extractdir}")
+
+    def sync(self):
+        print(f"Sycning {self.name}:{self.user}:{self.repo}:{self.commit}")
+        t1 = time.time()
+        if self.commit != self.readflag(FLAG_COMMIT) or self.checksum != self.readflag(FLAG_CHECKSUM):
+            self.download()
+        self.extract()
+        print(f"Synced in {(time.time() - t1):.2f} seconds")
+
+
+class Github(Webgit):
+    name = "github.com"
+
+    @classmethod
+    def check(cls, url):
+        parsed = super(Github, cls).check(url)
+        paths = parsed.path.split("/")
+        user = paths[1]
+        repo = paths[2]
+        if repo.endswith(".git"):
+            repo = repo[:-4]
+        fragments = dict(parse.parse_qsl(parsed.fragment))
+        ref = ""
+        for k in [FRAG_BRANCH, FRAG_COMMIT, FRAG_TAG]:
+            if k in fragments:
+                ref = f"tree/{fragments[k]}"
+                break
+        return user, repo, ref
+
+    def __init__(self, user, repo, ref):
+        self.user = user
+        self.repo = repo
+        self.ref = ref
+        with request.urlopen(f"https://github.com/{self.user}/{self.repo}/{self.ref}") as f:
+            page = f.read().decode()
+        commit = re.search(RE_COMMIT, page).group(1)
+        revision = re.search(RE_REV, page).group(1).replace(",", "")
+        super(Github, self).__init__(commit, revision)
+        self.archiveurl = f"https://github.com/{self.user}/{self.repo}/archive/{self.commit}{self.extension}"
+
+
+PROVIDERS = [Github]
+
+
+def getprovider(url):
+    err = None
+    for provider in PROVIDERS:
+        try:
+            return provider(*provider.check(url))
+        except Exception as _err:
+            err = _err
+            continue
+    return err
+
+
+def main():
+    parser = argparse.ArgumentParser(description='Gitweb, a dlagent targets for efficiency in Archlinux vcs packages')
+    cmd = parser.add_subparsers(dest="cmd", required=False)
+    sync_p = cmd.add_parser("sync", help="sync a given url")
+    version_p = cmd.add_parser("version", help="give the active revision and commit info")
+    for p in [sync_p, version_p]:
+        p.add_argument("url",
+                       help=f"url?signed#fragment, where fragment keys are {FRAG_BRANCH}, {FRAG_TAG}, {FRAG_COMMIT}. ie: https://github.com/hbiyik/gitweb.git#branch=master")
+    version_p.add_argument("--pattern",
+                           default=DEF_REVPATTERN,
+                           metavar=DEF_REVPATTERN,
+                           help=f"a string defining pattern of the returned version")
+    args = parser.parse_args()
+
+    if args.cmd == "sync":
+        p = getprovider(args.url)
+        if isinstance(p, Exception):
+            raise(p)
+        else:
+            p.sync()
+    elif args.cmd == "version":
+        p = getprovider(args.url)
+        if isinstance(p, Exception):
+            raise(p)
+        else:
+            print(p.version(args.pattern))
+
+
+if __name__ == "__main__":
+    main()
