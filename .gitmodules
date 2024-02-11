@@ -1,0 +1,3 @@
+[submodule "libv4l-rkmpp-git"]
+	path = libv4l-rkmpp-git
+	url = https://github.com/7Ji-PKGBUILDs/libv4l-rkmpp-git.git
