@@ -4,3 +4,6 @@
 [submodule "v4l-utils-mpp"]
 	path = v4l-utils-mpp
 	url = https://github.com/7Ji-PKGBUILDs/v4l-utils-mpp.git
+[submodule "chromium-mpp"]
+	path = chromium-mpp
+	url = https://github.com/7Ji-PKGBUILDs/chromium-mpp.git
