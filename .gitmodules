@@ -1,3 +1,6 @@
 [submodule "libv4l-rkmpp-git"]
 	path = libv4l-rkmpp-git
 	url = https://github.com/7Ji-PKGBUILDs/libv4l-rkmpp-git.git
+[submodule "v4l-utils-mpp"]
+	path = v4l-utils-mpp
+	url = https://github.com/7Ji-PKGBUILDs/v4l-utils-mpp.git
