@@ -14,7 +14,7 @@ pkgbase="lib${_model}"
 pkgname=("${pkgbase}-base")
 # Actual version uses -, but it is forbidden in pkgver
 pkgver="${_libver_major}.${_libver_minor}"
-pkgrel=1
+pkgrel=2
 url='https://developer.arm.com/Processors/Mali-G610'
 license=('custom')
 source=(
@@ -72,7 +72,6 @@ eval "package_${pkgname}() {
   pkgdesc='License and wrapper for ${_model_canonical}'
   optdepends=(
     'chrpath: To identify and fix rpath issues'
-    'dri2to3: Compatibility layer for Dri2-only driver'
     'gl4es: OpenGL to OpenGLES translation layer'
   )
   _package-base
@@ -146,7 +145,7 @@ for _suffix in ${_suffixes[@]}; do
   source_armv7h+=("${_lib_parent}/arm-linux-gnueabihf/${pkgbase}-${_libver_major}-${_suffix}.so")
   eval "package_${pkgbase}-${_suffix}() {
     pkgdesc='Blob driver for ${_model_canonical}, for ${_suffix} target'
-    depends=('${pkgname}' '${_model}-firmware')
+    depends=('${pkgname}' '${_model}-firmware' 'dri2to3')
     provides=(libmali{,-${_suffix}})
     install=install_${_suffix}
     local _suffix=${_suffix}
