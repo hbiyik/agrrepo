@@ -2,6 +2,7 @@
 # Maintainer boogieeeee <boogiepop AT gmx DOT com>
 #
 _codename=Nexus
+_xbmccommit=a257df77784e8c12e62fe1aebfd37bebea762e41
 _cmake_release_type=Release
 pkgname=kodi-nexus-binary-addons-git
 pkgver=r0
@@ -108,7 +109,7 @@ _addons=(
 DLAGENTS+=('gitweb-dlagent::/usr/bin/gitweb-dlagent sync %u')
 # checkout individual binary addons and ffmpeg
 source=(
-  "gitweb-dlagent://github.com/xbmc/xbmc/#branch=${_codename}"
+  "gitweb-dlagent://github.com/xbmc/xbmc/#commit=${_xbmccommit}"
   "gitweb-dlagent://github.com/xbmc/audiodecoder.2sf#branch=${_codename}"
   "gitweb-dlagent://github.com/xbmc/audiodecoder.asap#branch=${_codename}"
   "gitweb-dlagent://github.com/xbmc/audiodecoder.gme#branch=${_codename}"

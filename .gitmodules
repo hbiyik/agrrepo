@@ -1,9 +1,53 @@
 [submodule "libv4l-rkmpp-git"]
 	path = libv4l-rkmpp-git
 	url = https://github.com/7Ji-PKGBUILDs/libv4l-rkmpp-git.git
+	branch = "master"
 [submodule "v4l-utils-mpp"]
 	path = v4l-utils-mpp
 	url = https://github.com/7Ji-PKGBUILDs/v4l-utils-mpp.git
+	branch = "master"
 [submodule "chromium-mpp"]
 	path = chromium-mpp
 	url = https://github.com/7Ji-PKGBUILDs/chromium-mpp.git
+	branch = "master"
+[submodule "8852be-dkms-git"]
+	path = 8852be-dkms-git
+	url = https://github.com/7Ji-PKGBUILDs/8852be-dkms-git.git
+	branch = "master"
+[submodule "8852bu-dkms-git"]
+	path = 8852bu-dkms-git
+	url = https://github.com/7Ji-PKGBUILDs/8852bu-dkms-git.git
+	branch = "master"
+[submodule "dri2to3-git"]
+	path = dri2to3-git
+	url = https://github.com/7Ji-PKGBUILDs/dri2to3-git.git
+	branch = "master"
+[submodule "gitweb-dlagent"]
+	path = gitweb-dlagent
+	url = https://github.com/7Ji-PKGBUILDs/gitweb-dlagent.git
+[submodule "libmali-valhall-g610"]
+	path = libmali-valhall-g610
+	url = https://github.com/7Ji-PKGBUILDs/libmali-valhall-g610.git
+[submodule "librga-multi"]
+	path = librga-multi
+	url = https://github.com/7Ji-PKGBUILDs/librga-multi.git
+[submodule "r8125-dkms-git"]
+	path = r8125-dkms-git
+	url = https://github.com/7Ji-PKGBUILDs/r8125-dkms-git.git
+[submodule "gl4es-git"]
+	path = gl4es-git
+	url = https://github.com/7Ji-PKGBUILDs/gl4es-git.git
+[submodule "mesa-panfork-git"]
+	path = mesa-panfork-git
+	url = https://github.com/7Ji-PKGBUILDs/mesa-panfork-git.git
+[submodule "mpp-git"]
+	path = mpp-git
+	url = https://github.com/7Ji-PKGBUILDs/mpp-git.git
+[submodule "linux-radxa-rkbsp5-git"]
+	path = linux-radxa-rkbsp5-git
+	url = https://github.com/7Ji-PKGBUILDs/linux-radxa-rkbsp5-git.git
+	branch = "gitweb"
+[submodule "ffmpeg-rockchip-git"]
+	path = ffmpeg-rockchip-git
+	url = https://github.com/7Ji-PKGBUILDs/ffmpeg-rockchip-git.git
+	branch = "gitweb"
