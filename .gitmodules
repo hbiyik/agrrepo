@@ -47,11 +47,11 @@
 	path = linux-radxa-rkbsp5-git
 	url = https://github.com/7Ji-PKGBUILDs/linux-radxa-rkbsp5-git.git
 	branch = "gitweb"
-[submodule "ffmpeg-rockchip-git"]
-	path = ffmpeg-rockchip-git
-	url = https://github.com/7Ji-PKGBUILDs/ffmpeg-rockchip-git.git
-	branch = "gitweb"
 [submodule "kodi/kodi-mpp-git"]
 	path = kodi/kodi-mpp-git
 	url = https://github.com/7Ji-PKGBUILDs/kodi-mpp-git.git
+	branch = "gitweb"
+[submodule "ffmpeg-mpp-git"]
+	path = ffmpeg-mpp-git
+	url = https://github.com/7Ji-PKGBUILDs/ffmpeg-mpp-git.git
 	branch = "gitweb"
