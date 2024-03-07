@@ -4,7 +4,7 @@
 _codename=Nexus
 _xbmccommit=a257df77784e8c12e62fe1aebfd37bebea762e41
 _cmake_release_type=Release
-pkgname=kodi-nexus-binary-addons-git
+pkgname=kodi-binary-addons-git
 pkgver=r0
 pkgrel=1
 arch=('arm7f' 'aarch64')
@@ -13,7 +13,7 @@ license=('GPL2')
 makedepends=('git' 'cmake' 'kodi-platform' 'gitweb-dlagent')
 depends=('kodi-nexus')
 pkgdesc="All Kodi ${_codename} binary addons "
-provides=("kodi-nexus-binary-addons-git" "kodi-nexus-binary-addons" "kodi-binary-addons")
+provides=("kodi-binary-addons" "kodi-nexus-binary-addons" "kodi-nexus-binary-addons-git")
 conflicts=("kodi-binary-addons")
 
 # keep lto on for binary addons to link properly
@@ -329,7 +329,7 @@ _install_binary_addon() {
   fi
 }
 
-package_kodi-nexus-binary-addons-git() {
+package() {
   pkgdesc="All Kodi ${_codename} binary addons "
 
   cd $srcdir/addon-build/addons
