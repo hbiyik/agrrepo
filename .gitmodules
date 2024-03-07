@@ -51,3 +51,7 @@
 	path = ffmpeg-rockchip-git
 	url = https://github.com/7Ji-PKGBUILDs/ffmpeg-rockchip-git.git
 	branch = "gitweb"
+[submodule "kodi/kodi-mpp-git"]
+	path = kodi/kodi-mpp-git
+	url = https://github.com/7Ji-PKGBUILDs/kodi-mpp-git.git
+	branch = "gitweb"
