@@ -51,7 +51,7 @@
 	path = ffmpeg-mpp-git
 	url = https://github.com/7Ji-PKGBUILDs/ffmpeg-mpp-git.git
 	branch = "gitweb"
-[submodule "linux-aarch64-rockchip-bsp5.10-radxa"]
-	path = linux-aarch64-rockchip-bsp5.10-radxa
-	url = https://github.com/7Ji-PKGBUILDs/linux-aarch64-rockchip-bsp5.10-radxa.git
+[submodule "linux-aarch64-rockchip-bsp5.10-radxa-git"]
+	path = linux-aarch64-rockchip-bsp5.10-radxa-git
+	url = https://github.com/7Ji-PKGBUILDs/linux-aarch64-rockchip-bsp5.10-radxa-git.git
 	branch = "gitweb"
