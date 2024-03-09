@@ -55,3 +55,7 @@
 	path = kernel/rockchip/linux-aarch64-rockchip-bsp5.10-radxa-git
 	url = https://github.com/7Ji-PKGBUILDs/linux-aarch64-rockchip-bsp5.10-radxa-git.git
 	branch = "gitweb"
+[submodule "kernel/rockchip/linux-aarch64-rockchip-bsp6.1-joshua-git"]
+	path = kernel/rockchip/linux-aarch64-rockchip-bsp6.1-joshua-git
+	url = https://github.com/7Ji-PKGBUILDs/linux-aarch64-rockchip-bsp6.1-joshua-git.git
+	branch = "gitweb"
