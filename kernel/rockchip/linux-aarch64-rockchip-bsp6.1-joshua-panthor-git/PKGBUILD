@@ -14,7 +14,7 @@ _desc="with patches picked by Joshua Riek focusing on RK3588"
 makedepends=('cpio' 'xmlto' 'docbook-xsl' 'kmod' 'inetutils' 'bc' 'git' 'dtc' 'gitweb-dlagent')
 options=('!strip')
 _srcname='linux-rockchip'
-_url_git="gitweb-dlagent://${_url}/${_srcname}.git#branch=rk-6.1-rkr1-panthor-v5"
+_url_git="gitweb-dlagent://${_url}/${_srcname}.git#branch=rk-6.1-rkr1-panthor-v6"
 DLAGENTS+=('gitweb-dlagent::/usr/bin/gitweb-dlagent sync %u')
 source=(
   "$_url_git"
