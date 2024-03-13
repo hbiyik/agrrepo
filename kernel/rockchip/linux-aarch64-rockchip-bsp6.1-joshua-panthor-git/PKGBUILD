@@ -32,7 +32,7 @@ sha512sums=(
 
 pkgver() {
   cd "${_srcname}"
-  printf "%s.%s%s%s.r%s.g%s" \
+  printf "%s.%s%s%s.r%s.%s" \
     "$(grep '^VERSION = ' Makefile|awk -F' = ' '{print $2}')" \
     "$(grep '^PATCHLEVEL = ' Makefile|awk -F' = ' '{print $2}')" \
     "$(grep '^SUBLEVEL = ' Makefile|awk -F' = ' '{print $2}'|grep -vE '^0$'|sed 's/.*/.\0/')" \
