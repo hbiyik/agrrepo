@@ -19,8 +19,8 @@ pkgrel=1
 arch=('aarch64' 'armhf')
 makedepends=('meson' 'python-mako' 'bison' 'flex' 'cmake'
              'libxfixes' 'libxxf86vm' 'lm_sensors' 'libxshmfence' 'wayland-protocols' 'libdrm' 'libxrandr' 'libglvnd')
-depends=('egl-wayland' 'libxfixes' 'libxxf86vm' 'lm_sensors' 'libxshmfence' 'libdrm' 'libxrandr' 'libglvnd' 'vulkan-icd-loader')
-provides=('mesa-libgl' 'opengl-driver' 'mesa' ''vulkan-panfrost'')
+depends=('egl-wayland' 'libxfixes' 'libxxf86vm' 'lm_sensors' 'libxshmfence' 'libdrm' 'libxrandr' 'libglvnd' 'vulkan-icd-loader' 'valgrind')
+provides=('mesa-libgl' 'opengl-driver' 'mesa' 'vulkan-panfrost')
 conflicts=('mesa-libgl' 'mesa')
 url="https://gitlab.freedesktop.org/panfrost/mesa.git"
 license=('custom')
