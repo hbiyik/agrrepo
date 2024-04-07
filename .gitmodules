@@ -25,24 +25,30 @@
 [submodule "gitweb-dlagent"]
 	path = gitweb-dlagent
 	url = https://github.com/7Ji-PKGBUILDs/gitweb-dlagent.git
+	branch = "master"
 [submodule "libmali-valhall-g610"]
 	path = libmali-valhall-g610
 	url = https://github.com/7Ji-PKGBUILDs/libmali-valhall-g610.git
+	branch = "master"
 [submodule "librga-multi"]
 	path = librga-multi
 	url = https://github.com/7Ji-PKGBUILDs/librga-multi.git
+	branch = "master"
 [submodule "r8125-dkms-git"]
 	path = r8125-dkms-git
 	url = https://github.com/7Ji-PKGBUILDs/r8125-dkms-git.git
+	branch = "master"
 [submodule "gl4es-git"]
 	path = gl4es-git
 	url = https://github.com/7Ji-PKGBUILDs/gl4es-git.git
 [submodule "mesa-panfork-git"]
 	path = mesa-panfork-git
 	url = https://github.com/7Ji-PKGBUILDs/mesa-panfork-git.git
+	branch = "master"
 [submodule "mpp-git"]
 	path = mpp-git
 	url = https://github.com/7Ji-PKGBUILDs/mpp-git.git
+	branch = "master"
 [submodule "kodi/kodi-mpp-git"]
 	path = kodi/kodi-mpp-git
 	url = https://github.com/7Ji-PKGBUILDs/kodi-mpp-git.git
