@@ -1,8 +1,8 @@
 # vim:set ts=2 sw=2 et:
 # Maintainer boogieeeee <boogiepop AT gmx DOT com>
 #
-_codename=Nexus
-_xbmccommit=a257df77784e8c12e62fe1aebfd37bebea762e41
+_codename=Omega
+_xbmccommit="60c450005472e6d38929bb28c07d00589102818d"
 _cmake_release_type=Release
 pkgname=kodi-binary-addons-git
 pkgver=r0
@@ -11,9 +11,9 @@ arch=('arm7f' 'aarch64')
 url="https://kodi.tv"
 license=('GPL2')
 makedepends=('git' 'cmake' 'kodi-platform' 'gitweb-dlagent')
-depends=('kodi-nexus')
+depends=('kodi-omega')
 pkgdesc="All Kodi ${_codename} binary addons "
-provides=("kodi-binary-addons" "kodi-nexus-binary-addons" "kodi-nexus-binary-addons-git")
+provides=("kodi-binary-addons" "kodi-omega-binary-addons" "kodi-omega-binary-addons-git")
 conflicts=("kodi-binary-addons")
 
 # keep lto on for binary addons to link properly
