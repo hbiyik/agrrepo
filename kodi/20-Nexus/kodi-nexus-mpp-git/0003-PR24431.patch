@@ -1,0 +1,367 @@
+From 498f94d9f2cb724dcdeb12beeb095d560314b41a Mon Sep 17 00:00:00 2001
+From: boogie <boogiepop@gmx.com>
+Date: Sat, 13 Jan 2024 19:39:52 +0100
+Subject: [PATCH 1/2] windowing/gbm: Dynamic plane selection
+
+This commit allows kodi to select gui and video planes according to
+format and modifier combination and sorts to gui plane on top of video
+plane if zpos is supported and not immutable by the planes.
+---
+ .../HwDecRender/RendererDRMPRIME.cpp          |  4 +-
+ xbmc/windowing/gbm/drm/DRMAtomic.cpp          | 43 +++++++++++++++++++
+ xbmc/windowing/gbm/drm/DRMAtomic.h            |  1 +
+ xbmc/windowing/gbm/drm/DRMObject.cpp          | 30 +++++++++++++
+ xbmc/windowing/gbm/drm/DRMObject.h            |  4 ++
+ xbmc/windowing/gbm/drm/DRMUtils.cpp           | 21 +++++----
+ xbmc/windowing/gbm/drm/DRMUtils.h             |  5 ++-
+ 7 files changed, 96 insertions(+), 12 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIME.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIME.cpp
+index a07b4f7440..04d42c0982 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIME.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererDRMPRIME.cpp
+@@ -77,9 +77,11 @@ CBaseRenderer* CRendererDRMPRIME::Create(CVideoBuffer* buffer)
+     if (!plane)
+       return nullptr;
+ 
+-    if (!plane->SupportsFormatAndModifier(format, modifier))
++    if (!drm->FindPlanes(format, modifier))
+       return nullptr;
+ 
++    drm->SortPlanes();
++
+     return new CRendererDRMPRIME();
+   }
+ 
+diff --git a/xbmc/windowing/gbm/drm/DRMAtomic.cpp b/xbmc/windowing/gbm/drm/DRMAtomic.cpp
+index 5d61a699d4..04f4c57c42 100644
+--- a/xbmc/windowing/gbm/drm/DRMAtomic.cpp
++++ b/xbmc/windowing/gbm/drm/DRMAtomic.cpp
+@@ -63,6 +63,49 @@ bool CDRMAtomic::SetScalingFilter(CDRMObject* object, const char* name, const ch
+   return true;
+ }
+ 
++void CDRMAtomic::SortPlanes()
++{
++  bool supports_zpos = m_gui_plane->SupportsProperty("zpos");
++  bool zpos_immutable = supports_zpos && m_gui_plane->IsPropertyImmutable("zpos").value();
++
++  auto crtc_offset = std::distance(
++      m_crtcs.begin(),
++      std::find_if(m_crtcs.begin(), m_crtcs.end(),
++                   [this](auto& crtc) { return crtc->GetCrtcId() == m_crtc->GetCrtcId(); }));
++
++  // Disable unused planes after planes are re-selected in the active crtc
++  for (auto& plane : m_planes)
++  {
++    if (!(plane.get()->GetPossibleCrtcs() & (1 << crtc_offset)))
++      continue;
++
++    if ((m_video_plane == nullptr || m_video_plane->GetId() != plane.get()->GetId()) &&
++        (m_gui_plane == nullptr || m_gui_plane->GetId() != plane.get()->GetId()))
++    {
++      CLog::Log(LOGDEBUG, "CDRMUtils::{} - disabled plane {}", __FUNCTION__,
++                plane.get()->GetPlaneId());
++      AddProperty(plane.get(), "FB_ID", 0);
++      AddProperty(plane.get(), "CRTC_ID", 0);
++    }
++  }
++
++  if (!supports_zpos || zpos_immutable)
++    return;
++
++  // re-sort the video and gui planes
++  std::optional<uint64_t*> limits = m_gui_plane->GetRangePropertyLimits("zpos");
++
++  if (!limits)
++    return;
++
++  m_gui_plane->SetProperty("zpos", limits.value()[1]);
++  m_video_plane->SetProperty("zpos", limits.value()[0]);
++  CLog::Log(LOGDEBUG, "CDRMUtils::{} - gui plane id,zpos: {}, {}", __FUNCTION__,
++            m_gui_plane->GetId(), limits.value()[0] + 1);
++  CLog::Log(LOGDEBUG, "CDRMUtils::{} - video plane id,zpos: {}, {}", __FUNCTION__,
++            m_video_plane->GetId(), limits.value()[0]);
++}
++
+ void CDRMAtomic::DrmAtomicCommit(int fb_id, int flags, bool rendered, bool videoLayer)
+ {
+   uint32_t blob_id;
+diff --git a/xbmc/windowing/gbm/drm/DRMAtomic.h b/xbmc/windowing/gbm/drm/DRMAtomic.h
+index ca2cd9a1d0..50fb44f2dd 100644
+--- a/xbmc/windowing/gbm/drm/DRMAtomic.h
++++ b/xbmc/windowing/gbm/drm/DRMAtomic.h
+@@ -33,6 +33,7 @@ public:
+   bool InitDrm() override;
+   void DestroyDrm() override;
+   bool AddProperty(CDRMObject* object, const char* name, uint64_t value);
++  void SortPlanes();
+ 
+   bool DisplayHardwareScalingEnabled();
+ 
+diff --git a/xbmc/windowing/gbm/drm/DRMObject.cpp b/xbmc/windowing/gbm/drm/DRMObject.cpp
+index 599bb61cd0..43f95335cb 100644
+--- a/xbmc/windowing/gbm/drm/DRMObject.cpp
++++ b/xbmc/windowing/gbm/drm/DRMObject.cpp
+@@ -106,6 +106,25 @@ std::tuple<bool, uint64_t> CDRMObject::GetPropertyValue(const std::string& name,
+   return std::make_tuple(false, 0);
+ }
+ 
++std::optional<uint64_t*> CDRMObject::GetRangePropertyLimits(std::string_view name)
++{
++  auto property = std::find_if(m_propsInfo.begin(), m_propsInfo.end(),
++                               [&name](const auto& prop) { return prop->name == name; });
++
++  if (property == m_propsInfo.end())
++    return {};
++
++  auto prop = property->get();
++
++  if (!static_cast<bool>(drm_property_type_is(prop, DRM_MODE_PROP_RANGE)))
++    return {};
++
++  if (prop->count_values != 2)
++    return {};
++
++  return prop->values;
++}
++
+ bool CDRMObject::SetProperty(const std::string& name, uint64_t value)
+ {
+   auto property = std::find_if(m_propsInfo.begin(), m_propsInfo.end(),
+@@ -131,3 +150,14 @@ bool CDRMObject::SupportsProperty(const std::string& name)
+ 
+   return false;
+ }
++
++std::optional<bool> CDRMObject::IsPropertyImmutable(const std::string& name)
++{
++  auto property = std::find_if(m_propsInfo.begin(), m_propsInfo.end(),
++                               [&name](const auto& prop) { return prop->name == name; });
++
++  if (property == m_propsInfo.end())
++    return {};
++
++  return static_cast<bool>(drm_property_type_is(property->get(), DRM_MODE_PROP_IMMUTABLE));
++}
+diff --git a/xbmc/windowing/gbm/drm/DRMObject.h b/xbmc/windowing/gbm/drm/DRMObject.h
+index e2ae32652c..88e11c2b30 100644
+--- a/xbmc/windowing/gbm/drm/DRMObject.h
++++ b/xbmc/windowing/gbm/drm/DRMObject.h
+@@ -11,6 +11,8 @@
+ #include <cstddef>
+ #include <cstdint>
+ #include <memory>
++#include <optional>
++#include <string_view>
+ #include <vector>
+ 
+ #include <xf86drmMode.h>
+@@ -39,6 +41,8 @@ public:
+ 
+   bool SetProperty(const std::string& name, uint64_t value);
+   bool SupportsProperty(const std::string& name);
++  std::optional<bool> IsPropertyImmutable(const std::string& name);
++  std::optional<uint64_t*> GetRangePropertyLimits(std::string_view name);
+ 
+ protected:
+   explicit CDRMObject(int fd);
+diff --git a/xbmc/windowing/gbm/drm/DRMUtils.cpp b/xbmc/windowing/gbm/drm/DRMUtils.cpp
+index 6b61403a33..ccc28f9371 100644
+--- a/xbmc/windowing/gbm/drm/DRMUtils.cpp
++++ b/xbmc/windowing/gbm/drm/DRMUtils.cpp
+@@ -181,20 +181,23 @@ bool CDRMUtils::FindPreferredMode()
+   return true;
+ }
+ 
+-bool CDRMUtils::FindPlanes()
++bool CDRMUtils::FindPlanes(uint32_t format, uint64_t modifier)
+ {
+   for (size_t i = 0; i < m_crtcs.size(); i++)
+   {
+     if (!(m_encoder->GetPossibleCrtcs() & (1 << i)))
+       continue;
+ 
+-    auto videoPlane = std::find_if(m_planes.begin(), m_planes.end(), [&i](auto& plane) {
+-      if (plane->GetPossibleCrtcs() & (1 << i))
+-      {
+-        return plane->SupportsFormat(DRM_FORMAT_NV12);
+-      }
+-      return false;
+-    });
++    auto videoPlane =
++        std::find_if(m_planes.begin(), m_planes.end(),
++                     [&i, &format, &modifier](auto& plane)
++                     {
++                       if (plane->GetPossibleCrtcs() & (1 << i))
++                       {
++                         return plane->SupportsFormatAndModifier(format, modifier);
++                       }
++                       return false;
++                     });
+ 
+     uint32_t videoPlaneId{0};
+ 
+@@ -467,7 +470,7 @@ bool CDRMUtils::InitDrm()
+   if (!FindCrtc())
+     return false;
+ 
+-  if (!FindPlanes())
++  if (!FindPlanes(DRM_FORMAT_NV12, DRM_FORMAT_MOD_LINEAR))
+     return false;
+ 
+   if (!FindPreferredMode())
+diff --git a/xbmc/windowing/gbm/drm/DRMUtils.h b/xbmc/windowing/gbm/drm/DRMUtils.h
+index 5327e35570..9c01e54fb0 100644
+--- a/xbmc/windowing/gbm/drm/DRMUtils.h
++++ b/xbmc/windowing/gbm/drm/DRMUtils.h
+@@ -62,6 +62,8 @@ public:
+   static uint32_t FourCCWithAlpha(uint32_t fourcc);
+   static uint32_t FourCCWithoutAlpha(uint32_t fourcc);
+ 
++  bool FindPlanes(uint32_t format, uint64_t modifier);
++
+ protected:
+   bool OpenDrm(bool needConnector);
+   drm_fb* DrmFbGetFromBo(struct gbm_bo *bo);
+@@ -78,13 +80,13 @@ protected:
+   int m_width = 0;
+   int m_height = 0;
+ 
++  std::vector<std::unique_ptr<CDRMCrtc>> m_crtcs;
+   std::vector<std::unique_ptr<CDRMPlane>> m_planes;
+ 
+ private:
+   bool FindConnector();
+   bool FindEncoder();
+   bool FindCrtc();
+-  bool FindPlanes();
+   bool FindPreferredMode();
+   bool RestoreOriginalMode();
+   RESOLUTION_INFO GetResolutionInfo(drmModeModeInfoPtr mode);
+@@ -95,7 +97,6 @@ private:
+ 
+   std::vector<std::unique_ptr<CDRMConnector>> m_connectors;
+   std::vector<std::unique_ptr<CDRMEncoder>> m_encoders;
+-  std::vector<std::unique_ptr<CDRMCrtc>> m_crtcs;
+ };
+ 
+ }
+-- 
+2.43.0
+
+
+From 94e2f8b79e18ea3595f0b1bae1ee840913778eb9 Mon Sep 17 00:00:00 2001
+From: boogie <boogiepop@gmx.com>
+Date: Sat, 13 Jan 2024 21:48:53 +0100
+Subject: [PATCH 2/2] VideoLayerBridgeDRMPRIME: Use crop fields to render the
+ picture offsets
+
+Hardware decoders when used with AFBC compression, may output picture
+with offsets which may be different for each frame. Since this offset is
+applied after the decompression is done, only way to represent this in
+SRC_X and SRC_Y plane props. This commits utilizes AVFrame crop fields
+to pass picture offsets.
+---
+ .../cores/VideoPlayer/Buffers/VideoBufferDRMPRIME.h |  2 ++
+ .../VideoPlayer/DVDCodecs/Video/DVDVideoCodec.cpp   |  2 ++
+ .../VideoPlayer/DVDCodecs/Video/DVDVideoCodec.h     |  2 ++
+ .../DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp       | 13 +++++++++++++
+ .../HwDecRender/VideoLayerBridgeDRMPRIME.cpp        | 11 ++++++-----
+ 5 files changed, 25 insertions(+), 5 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/Buffers/VideoBufferDRMPRIME.h b/xbmc/cores/VideoPlayer/Buffers/VideoBufferDRMPRIME.h
+index e77f75b58b..f85f489a5d 100644
+--- a/xbmc/cores/VideoPlayer/Buffers/VideoBufferDRMPRIME.h
++++ b/xbmc/cores/VideoPlayer/Buffers/VideoBufferDRMPRIME.h
+@@ -52,6 +52,8 @@ public:
+   virtual const VideoPicture& GetPicture() const { return m_picture; }
+   virtual uint32_t GetWidth() const { return GetPicture().iWidth; }
+   virtual uint32_t GetHeight() const { return GetPicture().iHeight; }
++  virtual uint32_t GetXOffset() const { return GetPicture().iXOffset; }
++  virtual uint32_t GetYOffset() const { return GetPicture().iYOffset; }
+ 
+   virtual AVDRMFrameDescriptor* GetDescriptor() const = 0;
+   virtual bool IsValid() const { return true; }
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.cpp
+index 5e025945f5..8cf275b4e2 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.cpp
+@@ -56,6 +56,8 @@ void VideoPicture::Reset()
+ 
+   iWidth = 0;
+   iHeight = 0;
++  iXOffset = 0;
++  iYOffset = 0;
+   iDisplayWidth = 0;
+   iDisplayHeight = 0;
+ }
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.h
+index b23fd48383..f4ff9aa482 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.h
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.h
+@@ -72,6 +72,8 @@ public:
+ 
+   unsigned int iWidth;
+   unsigned int iHeight;
++  unsigned int iXOffset;
++  unsigned int iYOffset;
+   unsigned int iDisplayWidth;           //< width of the picture without black bars
+   unsigned int iDisplayHeight;          //< height of the picture without black bars
+ 
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
+index 80ca60290c..6d0ad08c53 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp
+@@ -468,6 +468,19 @@ void CDVDVideoCodecDRMPRIME::SetPictureParams(VideoPicture* pVideoPicture)
+   pVideoPicture->iWidth = m_pFrame->width;
+   pVideoPicture->iHeight = m_pFrame->height;
+ 
++  /* according to ffmpeg devs crop fields in AVFrame are not always maintained actively
++   * and may cause under-shot buffers or mis-aligned strides if not implemented correctly
++   * in decoders. drm_prime frames on the other hand has their own memory allocators,
++   * and as long as the plane number is single, there should be no future regression
++   * related to usage of crop fields.
++   */
++  AVDRMFrameDescriptor* desc = reinterpret_cast<AVDRMFrameDescriptor*>(m_pFrame->data[0]);
++  if (m_pFrame->format == AV_PIX_FMT_DRM_PRIME && desc->nb_layers == 1)
++  {
++    pVideoPicture->iXOffset = m_pFrame->crop_left;
++    pVideoPicture->iYOffset = m_pFrame->crop_top;
++  }
++
+   double aspect_ratio = 0;
+   AVRational pixel_aspect = m_pFrame->sample_aspect_ratio;
+   if (pixel_aspect.num)
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/VideoLayerBridgeDRMPRIME.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/VideoLayerBridgeDRMPRIME.cpp
+index 4b8ee5afbb..a81bd1cdf1 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/VideoLayerBridgeDRMPRIME.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/VideoLayerBridgeDRMPRIME.cpp
+@@ -118,9 +118,10 @@ bool CVideoLayerBridgeDRMPRIME::Map(CVideoBufferDRMPRIME* buffer)
+     flags = DRM_MODE_FB_MODIFIERS;
+ 
+   // add the video frame FB
+-  ret = drmModeAddFB2WithModifiers(m_DRM->GetFileDescriptor(), buffer->GetWidth(),
+-                                   buffer->GetHeight(), layer->format, handles, pitches, offsets,
+-                                   modifier, &buffer->m_fb_id, flags);
++  ret = drmModeAddFB2WithModifiers(m_DRM->GetFileDescriptor(),
++                                   buffer->GetWidth() + buffer->GetXOffset(),
++                                   buffer->GetHeight() + buffer->GetYOffset(), layer->format,
++                                   handles, pitches, offsets, modifier, &buffer->m_fb_id, flags);
+   if (ret < 0)
+   {
+     CLog::Log(LOGERROR, "CVideoLayerBridgeDRMPRIME::{} - failed to add fb {}, ret = {}",
+@@ -188,8 +189,8 @@ void CVideoLayerBridgeDRMPRIME::SetVideoPlane(CVideoBufferDRMPRIME* buffer, cons
+   auto plane = m_DRM->GetVideoPlane();
+   m_DRM->AddProperty(plane, "FB_ID", buffer->m_fb_id);
+   m_DRM->AddProperty(plane, "CRTC_ID", m_DRM->GetCrtc()->GetCrtcId());
+-  m_DRM->AddProperty(plane, "SRC_X", 0);
+-  m_DRM->AddProperty(plane, "SRC_Y", 0);
++  m_DRM->AddProperty(plane, "SRC_X", buffer->GetXOffset() << 16);
++  m_DRM->AddProperty(plane, "SRC_Y", buffer->GetYOffset() << 16);
+   m_DRM->AddProperty(plane, "SRC_W", buffer->GetWidth() << 16);
+   m_DRM->AddProperty(plane, "SRC_H", buffer->GetHeight() << 16);
+   m_DRM->AddProperty(plane, "CRTC_X", static_cast<int32_t>(destRect.x1) & ~1);
+-- 
+2.43.0
+
