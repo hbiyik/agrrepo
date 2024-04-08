@@ -37,15 +37,13 @@ prepare() {
   # Prepare the configuration file
   echo "Preparing config..."
   scripts/kconfig/merge_config.sh -m arch/arm64/configs/defconfig ../config
-  make olddefconfig prepare
-  
-  make -s kernelrelease > version
-  echo "Prepared for $(<version)"
 }
 
 build() {
   cd linux
 
+  make olddefconfig prepare
+  make -s kernelrelease > version
   unset LDFLAGS
   make ${MAKEFLAGS} Image modules
   make ${MAKEFLAGS} DTC_FLAGS="-@" dtbs
