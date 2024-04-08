@@ -55,14 +55,13 @@ prepare() {
 
   echo "Preparing config..."
   scripts/kconfig/merge_config.sh -m arch/arm64/configs/rockchip_defconfig ../localversion.config
-  make olddefconfig prepare
-
-  make -s kernelrelease > version
-  echo "Prepared for $(<version)"
 }
 
 build() {
   cd "${_srcname}"
+  
+  make olddefconfig prepare
+  make -s kernelrelease > version
 
   unset LDFLAGS
   make ${MAKEFLAGS} Image modules
