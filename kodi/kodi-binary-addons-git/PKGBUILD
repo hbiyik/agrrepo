@@ -5,7 +5,7 @@ _codename=Omega
 _xbmccommit="60c450005472e6d38929bb28c07d00589102818d"
 _cmake_release_type=Release
 pkgname=kodi-binary-addons-git
-pkgver=r0
+pkgver=r23580
 pkgrel=1
 arch=('arm7f' 'aarch64')
 url="https://kodi.tv"
@@ -299,24 +299,51 @@ prepare() {
 }
 
 build() {
-  echo "Building Kodi ${_codename} Addons"
-  mkdir -p "$srcdir/addon-build/addons"
+  echo "Building Kodi ${_codename} Binary Addons"
 
   for _addon in "${_addons[@]}"
   do : 
-    echo "Building $_addon"
+    echo "Configuring $_addon"
     mkdir -p "$srcdir/addon-build/$_addon"
     cd "$srcdir/addon-build/$_addon"
+    
     TMPDIR="$srcdir/tmp" cmake \
-      -DADDONS_TO_BUILD=$_addon \
-      -DADDON_SRC_PREFIX=$srcdir \
-      -DCMAKE_BUILD_TYPE=$_cmake_release_type \
-      -DCMAKE_INSTALL_PREFIX="$srcdir/addon-build/addons" \
-      -DPACKAGE_ZIP=1 \
-      "$srcdir/xbmc/cmake/addons"
-    # in case some binary addon fails to build just ignore and build the next one
-    make ${MAKEFLAGS} || true
+    -DADDONS_TO_BUILD=$_addon \
+    -DADDON_SRC_PREFIX=$srcdir \
+    -DCMAKE_BUILD_TYPE=$_cmake_release_type \
+    -DCMAKE_INSTALL_PREFIX="$srcdir/addon-build/$_addon/.install" \
+    -DPACKAGE_ZIP=1 \
+    -Wno-dev \
+    "$srcdir/xbmc/cmake/addons" || echo "Failed configuring $_addon, moving on ..."
   done
+
+  # in case makepkg exits, exit the sub processes
+  trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
+
+  _pids=()
+  for _addon in "${_addons[@]}"
+  do : 
+    echo "Started building $_addon"
+    cd "$srcdir/addon-build/$_addon"
+    
+    # build all addons in parallel, most time is consumed in configure stage so it should be fine
+    # on error, keep a log and continue building next one
+    { make ${MAKEFLAGS} > make.log 2>&1 || echo "Failed building $_addon, check $srcdir/addon-build/$_addon/make.log";
+      echo "Done building $_addon"; } &
+      
+    # collect each pid of background procesess
+    _pids+=( "$!" )
+  done
+
+  # wait for each sub process to finish
+  _index=0
+  for _pid in "${_pids[@]}"; do
+    echo "Waiting ${_addons[$_index]}"
+    wait "$_pid" || true
+    _index=$(($_index + 1))
+  done
+  
+  echo "Finished building Kodi ${_codename} Binary Addons"
 }
 
 _install_binary_addon() {
@@ -332,16 +359,17 @@ _install_binary_addon() {
 package() {
   pkgdesc="All Kodi ${_codename} binary addons "
 
-  cd $srcdir/addon-build/addons
+  cd $srcdir/addon-build
+
   for _addon in "${_addons[@]}"
   do :
   	if [ $_addon = "screensavers.rsxs" ]; then
-	  for _subaddon in $srcdir/addon-build/addons/screensaver.rsxs.*; do
+	  for _subaddon in $srcdir/addon-build/$_addon/.install/screensaver.rsxs.*; do
 		_subaddon_name="$(basename ${_subaddon})"
 		_install_binary_addon $_subaddon_name $_subaddon "$pkgdir/usr/lib/kodi/addons/$_subaddon_name" 
 	  done
   	else
-  	  _install_binary_addon $_addon $srcdir/addon-build/addons/$_addon "$pkgdir/usr/lib/kodi/addons/$_addon"
+  	  _install_binary_addon $_addon $srcdir/addon-build/$_addon/.install/$_addon "$pkgdir/usr/lib/kodi/addons/$_addon"
 	fi
   done
 }
