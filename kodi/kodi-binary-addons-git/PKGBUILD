@@ -195,10 +195,12 @@ source=(
   "gitweb-dlagent://github.com/xbmc/visualization.spectrum#branch=${_codename}"
   "gitweb-dlagent://github.com/xbmc/visualization.starburst#branch=${_codename}"
   "gitweb-dlagent://github.com/xbmc/visualization.waveform#branch=${_codename}"
+  "001-ffdirect-nettle-3-9.patch::https://github.com/xbmc/inputstream.ffmpegdirect/commit/7f1e7916b904e252d3e79745439666a3b30c6350.patch"
 )
 
 b2sums=('SKIP'
 	    'SKIP'
+        'SKIP'
         'SKIP'
         'SKIP'
         'SKIP'
@@ -296,6 +298,8 @@ pkgver() {
 prepare() {
   mkdir -p "$srcdir/addon-build"
   mkdir -p "$srcdir/tmp"
+  cd "$srcdir/inputstream.ffmpegdirect"
+  patch -p1 -R -i ../001-ffdirect-nettle-3-9.patch
 }
 
 build() {
