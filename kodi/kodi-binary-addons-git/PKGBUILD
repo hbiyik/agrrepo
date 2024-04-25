@@ -332,7 +332,7 @@ build() {
     
     # build all addons in parallel, most time is consumed in configure stage so it should be fine
     # on error, keep a log and continue building next one
-    { make ${MAKEFLAGS} > make.log 2>&1 || echo "Failed building $_addon, check $srcdir/addon-build/$_addon/make.log";
+    { make > make.log 2>&1 || echo "Failed building $_addon, check $srcdir/addon-build/$_addon/make.log";
       echo "Done building $_addon"; } &
       
     # collect each pid of background procesess
