@@ -78,6 +78,7 @@ source=(
   "0001-ffmpeg-buildsys.patch"
   "0002-PR21248.patch"
   "0003-PR24431.patch"
+  "0004-swig_4_2_0_fix.patch::https://github.com/fuzzard/xbmc/commit/f6b1efbd6b3876537a25e7008bbf35254a1c55c7.patch"
 )
 
 noextract=(
@@ -103,7 +104,8 @@ b2sums=('SKIP'
         '1801d84a0ca38410a78f23e7d44f37e6d53346753c853df2e7380d259ce1ae7f0c712825b95a5753ad0bc6360cfffe1888b9e7bc30da8b84549e0f1198248f61'
         'fbfdab0ec7aaa056c900c5cdd4652a165ea22585923a01ae132ff306f2203d8a18b5472fc56d53706aaaccae1e6e613e886c6ed5400a64a34e333547b732032e'
         'aa5ed3dd70277f4f87b73cef016ff9507a738fa0171efeaf8fe72f84287869ac2c0391cfbf202f44b76d1749016797b5a2de2ac96df6df73cf3837e7edb39911'
-        '83d77e51f159ab4a3834a8389f84fb5ec17792e94122162722f150ffce1d8dd7ca8f16b1782c7dfa49ecd9f2bc6739e61c066917972e99f87f19c3f798e90572')
+        '83d77e51f159ab4a3834a8389f84fb5ec17792e94122162722f150ffce1d8dd7ca8f16b1782c7dfa49ecd9f2bc6739e61c066917972e99f87f19c3f798e90572'
+        'SKIP')
 
 pkgver() {
   local _revnum=0
@@ -130,6 +132,7 @@ prepare() {
   patch -p1 -N -i ../0001-ffmpeg-buildsys.patch
   patch -p1 -N -i ../0002-PR21248.patch
   patch -p1 -N -i ../0003-PR24431.patch
+  patch -p1 -N -i ../0004-swig_4_2_0_fix.patch
 }
 
 build() {
