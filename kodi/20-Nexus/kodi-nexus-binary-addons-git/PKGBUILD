@@ -107,9 +107,8 @@ _addons=(
 )
 
 DLAGENTS+=('gitweb-dlagent::/usr/bin/gitweb-dlagent sync %u')
-# checkout individual binary addons and ffmpeg
-source=(
-  "gitweb-dlagent://github.com/xbmc/xbmc/#branch=${_xbmccommit}"
+
+_addons_src=(
   "gitweb-dlagent://github.com/xbmc/audiodecoder.2sf#branch=${_codename}"
   "gitweb-dlagent://github.com/xbmc/audiodecoder.asap#branch=${_codename}"
   "gitweb-dlagent://github.com/xbmc/audiodecoder.gme#branch=${_codename}"
@@ -196,6 +195,15 @@ source=(
   "gitweb-dlagent://github.com/xbmc/visualization.starburst#branch=${_codename}"
   "gitweb-dlagent://github.com/xbmc/visualization.waveform#branch=${_codename}"
 )
+
+source=(
+  "gitweb-dlagent://github.com/xbmc/xbmc/#branch=${_xbmccommit}"
+)
+
+for _addon_src in "${_addons_src[@]}"
+do :
+  source+=(${_addon_src})
+done
 
 b2sums=('SKIP'
 	    'SKIP'
@@ -286,9 +294,10 @@ b2sums=('SKIP'
 
 pkgver() {
   local _acommits=0
-  for _addon in "${_addons[@]}"
+  for _addon_src in "${_addons_src[@]}"
   do :
-  	_acommits=$(($_acommits + $(cat ${srcdir}/../.gitweb/${_addon}_revision)))
+  	_acommit=$(gitweb-dlagent version ${_addon_src} --pattern \{revision\})
+    _acommits=$(($_acommits + $_acommit))
   done
   printf "r%s" $_acommits
 }
