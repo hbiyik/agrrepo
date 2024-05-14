@@ -18,7 +18,7 @@ optdepends=('icecream-sundae: A commandline monitor for Icecream'
             'ccache: ccache enabled remote builds.')
 conflicts=('icecream')
 backup=('etc/icecream.conf')
-arch=('x86_64')
+arch=('x86_64' 'armv7h' 'aarch64')
 install=icecream.install
 source=('git+https://github.com/hbiyik/icecream.git'
         icecream.conf
