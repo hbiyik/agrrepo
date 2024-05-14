@@ -7,7 +7,7 @@ pkgname=(
 )
 pkgver=6.8rc7.r1251099.cff511f9
 pkgrel=1
-arch=('any')
+arch=('aarch64')
 url="https://gitlab.collabora.com/hardware-enablement/rockchip-3588/linux.git"
 license=('GPL2')
 makedepends=('kmod' 'bc' 'dtc' 'uboot-tools')
