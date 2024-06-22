@@ -17,7 +17,7 @@ provides=("kodi-binary-addons" "kodi-omega-binary-addons" "kodi-omega-binary-add
 conflicts=("kodi-binary-addons")
 
 # keep lto on for binary addons to link properly
-options=(lto strip)
+options=(strip)
 
 _addons=(
   audiodecoder.2sf
@@ -200,6 +200,7 @@ _addons_src=(
 source=(
   "gitweb-dlagent://github.com/xbmc/xbmc/#commit=${_xbmccommit}"
   "001-ffmpegdirect_zvbi.patch"
+  "002-ffmpegdirect-gnutls-nettle-hogweed-linker-order.patch"
 )
 
 for _addon_src in "${_addons_src[@]}"
@@ -209,6 +210,7 @@ done
 
 b2sums=('SKIP'
 	    'SKIP'
+        'SKIP'
         'SKIP'
         'SKIP'
         'SKIP'
@@ -310,6 +312,7 @@ prepare() {
   mkdir -p "$srcdir/tmp"
   cd "$srcdir/inputstream.ffmpegdirect"
   patch -p1 -N -i ../001-ffmpegdirect_zvbi.patch
+  patch -p1 -N -i ../002-ffmpegdirect-gnutls-nettle-hogweed-linker-order.patch
 }
 
 build() {
