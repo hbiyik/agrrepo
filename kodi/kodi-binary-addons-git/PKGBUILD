@@ -5,13 +5,13 @@ _codename=Omega
 _xbmccommit="60c450005472e6d38929bb28c07d00589102818d"
 _cmake_release_type=Release
 pkgname=kodi-binary-addons-git
-pkgver=r23580
+pkgver=r23958
 pkgrel=1
 arch=('armv7h' 'aarch64')
 url="https://kodi.tv"
 license=('GPL2')
 makedepends=('git' 'cmake' 'kodi-platform' 'gitweb-dlagent')
-depends=('kodi-omega')
+depends=('kodi')
 pkgdesc="All Kodi ${_codename} binary addons "
 provides=("kodi-binary-addons" "kodi-omega-binary-addons" "kodi-omega-binary-addons-git")
 conflicts=("kodi-binary-addons")
@@ -199,7 +199,7 @@ _addons_src=(
 
 source=(
   "gitweb-dlagent://github.com/xbmc/xbmc/#commit=${_xbmccommit}"
-  "001-ffdirect-nettle-3-9.patch::https://github.com/xbmc/inputstream.ffmpegdirect/commit/7f1e7916b904e252d3e79745439666a3b30c6350.patch"
+  "001-ffmpegdirect_zvbi.patch"
 )
 
 for _addon_src in "${_addons_src[@]}"
@@ -309,7 +309,7 @@ prepare() {
   mkdir -p "$srcdir/addon-build"
   mkdir -p "$srcdir/tmp"
   cd "$srcdir/inputstream.ffmpegdirect"
-  patch -p1 -R -i ../001-ffdirect-nettle-3-9.patch
+  patch -p1 -N -i ../001-ffmpegdirect_zvbi.patch
 }
 
 build() {
