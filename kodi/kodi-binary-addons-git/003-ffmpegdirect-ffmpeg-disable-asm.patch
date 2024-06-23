@@ -1,0 +1,11 @@
+diff -Naur inputstream.ffmpegdirect/depends/common/ffmpeg/CMakeLists.txt inputstream.ffmpegdirect.new/depends/common/ffmpeg/CMakeLists.txt
+--- inputstream.ffmpegdirect/depends/common/ffmpeg/CMakeLists.txt	2024-05-12 15:33:45.000000000 +0200
++++ inputstream.ffmpegdirect.new/depends/common/ffmpeg/CMakeLists.txt	2024-06-23 01:33:38.688954734 +0200
+@@ -36,6 +36,7 @@
+                           --enable-demuxer=dash
+                           --enable-libxml2
+                           --enable-zlib
++                          --disable-asm
+                           --enable-static)
+ 
+ # Determinate debug or release and set ffmpeg for

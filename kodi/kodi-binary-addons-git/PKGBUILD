@@ -201,6 +201,7 @@ source=(
   "gitweb-dlagent://github.com/xbmc/xbmc/#commit=${_xbmccommit}"
   "001-ffmpegdirect_zvbi.patch"
   "002-ffmpegdirect-gnutls-nettle-hogweed-linker-order.patch"
+  "003-ffmpegdirect-ffmpeg-disable-asm.patch"
 )
 
 for _addon_src in "${_addons_src[@]}"
@@ -210,6 +211,7 @@ done
 
 b2sums=('SKIP'
 	    'SKIP'
+        'SKIP'
         'SKIP'
         'SKIP'
         'SKIP'
@@ -313,6 +315,7 @@ prepare() {
   cd "$srcdir/inputstream.ffmpegdirect"
   patch -p1 -N -i ../001-ffmpegdirect_zvbi.patch
   patch -p1 -N -i ../002-ffmpegdirect-gnutls-nettle-hogweed-linker-order.patch
+  patch -p1 -N -i ../003-ffmpegdirect-ffmpeg-disable-asm.patch
 }
 
 build() {
