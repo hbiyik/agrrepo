@@ -17,7 +17,7 @@ provides=("kodi-binary-addons" "kodi-omega-binary-addons" "kodi-omega-binary-add
 conflicts=("kodi-binary-addons")
 
 # keep lto on for binary addons to link properly
-options=(strip)
+options=(strip lto)
 
 _addons=(
   audiodecoder.2sf
