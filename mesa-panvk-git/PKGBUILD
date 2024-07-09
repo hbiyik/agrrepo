@@ -24,7 +24,7 @@ provides=('mesa-libgl' 'opengl-driver' 'mesa' 'vulkan-panfrost')
 conflicts=('mesa-libgl' 'mesa')
 url="https://gitlab.freedesktop.org/bbrezillion/mesa.git"
 license=('custom')
-options=('!lto')
+options=('!lto' 'debug')
 source=(
   "mesa::git+https://gitlab.freedesktop.org/bbrezillon/mesa.git#branch=panvk-v10-event"
   LICENSE
