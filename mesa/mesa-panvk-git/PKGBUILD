@@ -22,11 +22,11 @@ makedepends=('meson' 'python-mako' 'python-packaging' 'bison' 'flex' 'cmake'
 depends=('egl-wayland' 'libxfixes' 'libxxf86vm' 'lm_sensors' 'libxshmfence' 'libdrm' 'libxrandr' 'libglvnd' 'vulkan-icd-loader' 'valgrind' 'libunwind')
 provides=('mesa-libgl' 'opengl-driver' 'mesa' 'vulkan-panfrost')
 conflicts=('mesa-libgl' 'mesa')
-url="https://gitlab.freedesktop.org/bbrezillion/mesa.git"
+url="https://gitlab.freedesktop.org/rmckeever/mesa.git"
 license=('custom')
 options=('!lto' 'debug')
 source=(
-  "mesa::git+https://gitlab.freedesktop.org/bbrezillon/mesa.git#branch=panvk-v10"
+  "mesa::git+https://gitlab.freedesktop.org/bbrezillon/mesa.git#branch=panvk-v10-event"
   LICENSE
 )
 sha512sums=(
