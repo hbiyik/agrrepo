@@ -1,13 +1,13 @@
 [submodule "libv4l-rkmpp-git"]
-	path = libv4l-rkmpp-git
+	path = mpp/libv4l-rkmpp-git
 	url = https://github.com/7Ji-PKGBUILDs/libv4l-rkmpp-git.git
 	branch = "master"
 [submodule "v4l-utils-mpp"]
-	path = v4l-utils-mpp
+	path = mpp/v4l-utils-mpp
 	url = https://github.com/7Ji-PKGBUILDs/v4l-utils-mpp.git
 	branch = "master"
 [submodule "chromium-mpp"]
-	path = chromium-mpp
+	path = mpp/chromium-mpp
 	url = https://github.com/7Ji-PKGBUILDs/chromium-mpp.git
 	branch = "master"
 [submodule "8852be-dkms-git"]
@@ -46,7 +46,7 @@
 	url = https://github.com/7Ji-PKGBUILDs/mesa-panfork-git.git
 	branch = "master"
 [submodule "mpp-git"]
-	path = mpp-git
+	path = mpp/mpp-git
 	url = https://github.com/7Ji-PKGBUILDs/mpp-git.git
 	branch = "master"
 [submodule "kodi/kodi-mpp-git"]
@@ -54,7 +54,7 @@
 	url = https://github.com/7Ji-PKGBUILDs/kodi-mpp-git.git
 	branch = "gitweb"
 [submodule "ffmpeg-mpp-git"]
-	path = ffmpeg-mpp-git
+	path = mpp/ffmpeg-mpp-git
 	url = https://github.com/7Ji-PKGBUILDs/ffmpeg-mpp-git.git
 	branch = "gitweb"
 [submodule "kernel/rockchip/linux-aarch64-rockchip-bsp5.10-radxa-git"]
