@@ -11,11 +11,11 @@
 	url = https://github.com/7Ji-PKGBUILDs/chromium-mpp.git
 	branch = "master"
 [submodule "8852be-dkms-git"]
-	path = 8852be-dkms-git
+	path = dkms/8852be-dkms-git
 	url = https://github.com/7Ji-PKGBUILDs/8852be-dkms-git.git
 	branch = "master"
 [submodule "8852bu-dkms-git"]
-	path = 8852bu-dkms-git
+	path = dkms/8852bu-dkms-git
 	url = https://github.com/7Ji-PKGBUILDs/8852bu-dkms-git.git
 	branch = "master"
 [submodule "dri2to3-git"]
@@ -35,7 +35,7 @@
 	url = https://github.com/7Ji-PKGBUILDs/librga-multi.git
 	branch = "master"
 [submodule "r8125-dkms-git"]
-	path = r8125-dkms-git
+	path = dkms/r8125-dkms-git
 	url = https://github.com/7Ji-PKGBUILDs/r8125-dkms-git.git
 	branch = "master"
 [submodule "gl4es-git"]
