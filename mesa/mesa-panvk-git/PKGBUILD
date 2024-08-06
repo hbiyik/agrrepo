@@ -94,6 +94,7 @@ package() {
   
   _install fakeinstall/usr/share/vulkan
   _install fakeinstall/usr/lib/libvulkan*
+  _install fakeinstall/usr/lib/libgallium*
   
   find fakeinstall -depth -print0 | xargs -0 rmdir
 
