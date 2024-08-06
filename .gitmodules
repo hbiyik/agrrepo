@@ -42,7 +42,7 @@
 	path = gl4es-git
 	url = https://github.com/7Ji-PKGBUILDs/gl4es-git.git
 [submodule "mesa-panfork-git"]
-	path = mesa-panfork-git
+	path = mesa/mesa-panfork-git
 	url = https://github.com/7Ji-PKGBUILDs/mesa-panfork-git.git
 	branch = "master"
 [submodule "mpp-git"]
