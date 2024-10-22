@@ -1,0 +1,44 @@
+# Maintainer: boogiepop <boogiepop@gmx.com>
+
+_pkgname=iwlwifi-backport
+_srcname=backport-iwlwifi
+pkgname=$_pkgname-dkms-git
+pkgver=core91.r10661
+pkgrel=1
+pkgdesc="Backport of intel iwlwifi wireless drivers to linux LTS kernels"
+arch=('any')
+url="https://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/${_srcname}.git"
+license=('GPL')
+provides=(${pkgname}=${pkgver} ${_pkgname}-dkms=${pkgver})
+source=(git+$url dkms.conf)
+sha256sums=('SKIP'
+            'SKIP')
+depends=('dkms' 'python' 'bc')
+makedepends=('git' 'grep')
+
+_switchcore(){
+  cd ${srcdir}/$_srcname
+  _core=$(git ls-remote -b --sort -version:refname | grep -oh core[0-9]* | head -n 1)
+  git checkout release/${_core} --quiet
+  git reset --hard --quiet
+  printf $_core
+}
+
+pkgver() {
+  cd ${srcdir}/$_srcname
+  _core=$(_switchcore)
+  _commits="$(git rev-list --count HEAD)"
+  printf $_core.r$_commits
+}
+
+package() {
+  install -Dm644 dkms.conf "${pkgdir}"/usr/src/${_pkgname}-${pkgver}/dkms.conf
+  # Set name and version
+  sed -e "s/@PKGBASE@/${_pkgname}/" \
+      -e "s/@PKGVER@/${pkgver}/" \
+      -i "${pkgdir}"/usr/src/${_pkgname}-${pkgver}/dkms.conf
+  # Copy sources (including Makefile)
+  _switchcore
+  cp -r ${srcdir}/$_srcname/* "${pkgdir}"/usr/src/${_pkgname}-${pkgver}/
+}
+
