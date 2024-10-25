@@ -1,67 +1,71 @@
 [submodule "libv4l-rkmpp-git"]
 	path = mpp/libv4l-rkmpp-git
 	url = https://github.com/7Ji-PKGBUILDs/libv4l-rkmpp-git.git
-	branch = "master"
+	branch = master
 [submodule "v4l-utils-mpp"]
 	path = mpp/v4l-utils-mpp
 	url = https://github.com/7Ji-PKGBUILDs/v4l-utils-mpp.git
-	branch = "master"
+	branch = master
 [submodule "chromium-mpp"]
 	path = mpp/chromium-mpp
 	url = https://github.com/7Ji-PKGBUILDs/chromium-mpp.git
-	branch = "master"
+	branch = master
 [submodule "8852be-dkms-git"]
 	path = dkms/8852be-dkms-git
 	url = https://github.com/7Ji-PKGBUILDs/8852be-dkms-git.git
-	branch = "master"
+	branch = master
 [submodule "8852bu-dkms-git"]
 	path = dkms/8852bu-dkms-git
 	url = https://github.com/7Ji-PKGBUILDs/8852bu-dkms-git.git
-	branch = "master"
+	branch = master
 [submodule "dri2to3-git"]
 	path = dri2to3-git
 	url = https://github.com/7Ji-PKGBUILDs/dri2to3-git.git
-	branch = "master"
+	branch = master
 [submodule "gitweb-dlagent"]
 	path = gitweb-dlagent
 	url = https://github.com/7Ji-PKGBUILDs/gitweb-dlagent.git
-	branch = "master"
+	branch = master
 [submodule "libmali-valhall-g610"]
 	path = libmali-valhall-g610
 	url = https://github.com/7Ji-PKGBUILDs/libmali-valhall-g610.git
-	branch = "master"
+	branch = master
 [submodule "librga-multi"]
 	path = librga-multi
 	url = https://github.com/7Ji-PKGBUILDs/librga-multi.git
-	branch = "master"
+	branch = master
 [submodule "r8125-dkms-git"]
 	path = dkms/r8125-dkms-git
 	url = https://github.com/7Ji-PKGBUILDs/r8125-dkms-git.git
-	branch = "master"
+	branch = master
 [submodule "gl4es-git"]
 	path = gl4es-git
 	url = https://github.com/7Ji-PKGBUILDs/gl4es-git.git
 [submodule "mesa-panfork-git"]
 	path = mesa/mesa-panfork-git
 	url = https://github.com/7Ji-PKGBUILDs/mesa-panfork-git.git
-	branch = "master"
+	branch = master
 [submodule "mpp-git"]
 	path = mpp/mpp-git
 	url = https://github.com/7Ji-PKGBUILDs/mpp-git.git
-	branch = "master"
+	branch = master
 [submodule "kodi/kodi-mpp-git"]
 	path = kodi/kodi-mpp-git
 	url = https://github.com/7Ji-PKGBUILDs/kodi-mpp-git.git
-	branch = "gitweb"
+	branch = gitweb
 [submodule "ffmpeg-mpp-git"]
 	path = mpp/ffmpeg-mpp-git
 	url = https://github.com/7Ji-PKGBUILDs/ffmpeg-mpp-git.git
-	branch = "gitweb"
+	branch = gitweb
 [submodule "kernel/rockchip/linux-aarch64-rockchip-bsp5.10-radxa-git"]
 	path = kernel/rockchip/linux-aarch64-rockchip-bsp5.10-radxa-git
 	url = https://github.com/7Ji-PKGBUILDs/linux-aarch64-rockchip-bsp5.10-radxa-git.git
-	branch = "gitweb"
+	branch = gitweb
 [submodule "kernel/rockchip/linux-aarch64-rockchip-bsp6.1-joshua-git"]
 	path = kernel/rockchip/linux-aarch64-rockchip-bsp6.1-joshua-git
 	url = https://github.com/7Ji-PKGBUILDs/linux-aarch64-rockchip-bsp6.1-joshua-git.git
-	branch = "gitweb"
+	branch = gitweb
+[submodule "mpp/sunshine-mpp-git"]
+	path = mpp/sunshine-mpp-git
+	url = https://github.com/7Ji-PKGBUILDs/sunshine-mpp-git.git
+	branch = master
