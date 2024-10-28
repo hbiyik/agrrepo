@@ -1,0 +1,81 @@
+# ----------- START EXTERNAL LIBRARY -------------
+# ideally below codebase can be an external package with a functional call named ie
+# alarm_inherit(pkgref:'extra/firefox', *list_of_method_to_override: prepare build ...)
+# the overriden functions will be backed up with prefix alarm_ for future use: ie alarm_prepare
+
+_alarm_base="https://github.com/archlinuxarm/PKGBUILDs/raw/refs/heads/master/"
+_alarm_pkg="extra/firefox"
+_alarm_url="$_alarm_base$_alarm_pkg"
+_alarm_pkgbuild="$_alarm_url/PKGBUILD"
+_basepath=$(dirname $BASH_SOURCE)
+
+# source the remote PKGBUILD
+eval "$(curl -s -L $_alarm_pkgbuild)"
+
+# sync the localfiles
+_skip_prefix=("http://" "https://" "ftp://" "file://" "scp://" "rsync://" "git+" "bzr+" "fossil+" "hg+" "svn+")
+for _source in ${source[@]}; do
+  #TODO: detect filename tags ie: somefile::https://some/url
+  _skip=0
+  
+  # check if source is a local file
+  for _prefix in ${_skip_prefix[@]}; do
+	if [[ $_source == $_prefix* ]]; then
+	  _skip=1
+	fi
+  done
+  
+  # skip non local files
+  if [ $_skip == 1 ]; then
+    continue
+  fi
+  
+  # sync the local file if there is a change
+  # TO-DO: only update when there is
+  curl -L -s $_alarm_url/$_source -o $_basepath/$_source
+done
+
+# list of functions to override while keeping the old
+_overrrides=("prepare" "build" "package")
+for _override in ${_overrrides[@]}; do
+  eval "`declare -f ${_override} | sed '1s/.*/alarm_&/'`"
+done
+
+# ------------------- END EXTERNAL LIBRARY --------------
+
+# ------------------- START ACTUAL PKGBUILD -------------
+# override only relevant parts, so that existing PKGBUILD could be reused
+
+_gecko_base=25ea24a7a5b1be54830d5625ce57a0e44e32d3d9
+_gecko_branch=mpp-release
+source+=("mpp.patch::https://github.com/hbiyik/gecko-dev/compare/${_gecko_base}...${_gecko_branch}.patch")
+sha256sums+=("SKIP")
+b2sums+=("SKIP")
+# below swapping could be a part of the library
+_pkgname=firefox-mpp
+alarm_pkgname=$pkgname
+pkgname=$_pkgname
+
+prepare(){
+  # patch with extra stuff
+  cd $srcdir/firefox-$pkgver
+  patch -p1 -N -i ../mpp.patch
+  cd $srcdir
+  alarm_prepare
+}
+
+build(){
+  # pkgname is used in the build as variable so swap it
+  pkgname=$alarm_pkgname
+  alarm_build
+  pkgname=$_pkgname
+}
+
+package(){
+  # pkgname is used in the package as variable so swap it
+  pkgname=$alarm_pkgname
+  alarm_package
+  pkgname=$_pkgname
+}
+
+# ----------------------- END ACTUAL PKGBUILD -----------------
