@@ -51,6 +51,7 @@ _gecko_branch=mpp-release
 source+=("mpp.patch::https://github.com/hbiyik/gecko-dev/compare/${_gecko_base}...${_gecko_branch}.patch")
 sha256sums+=("SKIP")
 b2sums+=("SKIP")
+arch+=("aarch64" "arm7f")
 # below swapping could be a part of the library
 _pkgname=firefox-mpp
 alarm_pkgname=$pkgname
