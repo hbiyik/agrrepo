@@ -1,0 +1,18 @@
+#!/bin/bash
+
+ROOTFS="/usr/lib/acestream"
+CACHEDIR="/var/lib/ACEStream"
+ANDROID_ROOT=/system
+ANDROID_DATA=/data
+ACEPATH=/data/org.acestream.media
+PYTHON_HOME=$ACEPATH/python/lib
+PYTHON_PATH=$ACEPATH/python/lib/stdlib.zip:$ACEPATH/python/lib/modules:$ACEPATH/data
+
+systemd-nspawn -D $ROOTFS \
+ -E LD_LIBRARY_PATH=/data/org.acestream.media/python/lib \
+ -E ANDROID_ROOT=$ANDROID_ROOT \
+ -E ANDROID_DATA=$ANDROID_DATA \
+ -E PYTHONHOME=$PYTHON_HOME \
+ -E PYTHONPATH=$PYTHON_PATH \
+ --bind $CACHEDIR:$ACEPATH/.ACEStream \
+  $ACEPATH/python/bin/python $ACEPATH/main.py $@

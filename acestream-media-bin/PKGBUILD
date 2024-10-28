@@ -1,0 +1,62 @@
+# Maintainer: Mahmut Dikcizgi <boogiepop a~t gmx com>
+#	https://download.acestream.media/android/media.web/stable/AceStreamMedia-3.1.80.0-armv8_64.apk
+_arch1=armv7
+_arch2=armeabi-v7a
+_pkgver=3.1.80.0
+_modver=1
+_bin=acestreamengine
+pkgname=acestream-media-bin
+pkgver=$_pkgver.$_modver
+pkgrel=1
+pkgdesc='Acestream Media Service'
+arch=('aarch64' 'armv7h')
+url='https://acestream.org'
+depends=(systemd)
+provides=("acestream-engine")
+conflicts=("acestream-engine")
+makedepends=('unzip')
+options=(!strip !debug)
+source=(acestream.apk::https://github.com/hbiyik/agrrepo/releases/download/acestream-media-bin/acestream_media_${_pkgver}_armv7h.apk
+        android_runtime.tar.gz::https://github.com/hbiyik/agrrepo/releases/download/acestream-media-bin/android_runtime_armv7h.tar.gz
+        dns.tar.gz::https://github.com/rthalley/dnspython/releases/download/v2.6.1/dnspython-2.6.1.tar.gz
+        tzdata::https://github.com/hbiyik/agrrepo/releases/download/acestream-media-bin/tzdata
+        main.py
+        $_bin)
+
+sha256sums=('1fcc7abc0a13933578a950cfcc6f684e98b614542c77efef93e9a4399f157c54'
+            'c30ce0d797058ae573f26d9347e5cdac5856fac64b12d5eda78a6224baa9dfde'
+            'e8f0f9c23a7b7cb99ded64e6c3a6f3e701d78f50c55e002b839dea7225cff7cc'
+            '8a107a8ba7347ef4e6d659b0d1d60057453ae9aa7d0131deb682f5493d3e9f9e'
+            '84361b0b3423ab7e2c9a903be8d778048ff62d9a8729b591f389e8577e3bc66f'
+            '757fed87b2e9d239a34b47138703bd76a40e19ab4af42ddbc5adb7adafd42d72')
+
+
+package() {
+	_prefix="/usr/lib/acestream"
+	_statedir="/var/lib/ACEStream"
+	install -d ${pkgdir}/usr/bin
+	install -d ${pkgdir}${_statedir}
+	install -d ${pkgdir}${_prefix}/storage/org.acestream.engine
+	install -d ${pkgdir}${_prefix}/data/org.acestream.media
+	install -d ${pkgdir}${_prefix}/sys
+	install -d ${pkgdir}${_prefix}/dev
+	install -d ${pkgdir}${_prefix}/proc
+	install -d ${pkgdir}${_prefix}/run
+	install -d ${pkgdir}${_prefix}/system/usr/share/zoneinfo
+	install -d ${pkgdir}${_prefix}/system/bin
+	install -d ${pkgdir}${_prefix}/system/sbin
+	install -d ${pkgdir}${_prefix}/system/etc
+	install -d ${pkgdir}${_prefix}/usr/bin
+	install -d ${pkgdir}${_prefix}/usr/share
+	ln -sf system/bin ${pkgdir}${_prefix}/bin
+	ln -sf system/sbin ${pkgdir}${_prefix}/sbin
+	ln -sf system/etc ${pkgdir}${_prefix}/etc
+	cp -rf ${srcdir}/system ${pkgdir}${_prefix}
+	unzip -o ${srcdir}/assets/engine/${_arch2}_private_py.zip -d ${pkgdir}${_prefix}/data/org.acestream.media
+	unzip -o ${srcdir}/assets/engine/${_arch2}_private_res.zip -d ${pkgdir}${_prefix}/data/org.acestream.media
+	cp -rf ${srcdir}/dnspython*/dns ${pkgdir}${_prefix}/data/org.acestream.media/python/lib/modules
+		cp -f ${srcdir}/tzdata ${pkgdir}${_prefix}/system/usr/share/zoneinfo/tzdata
+	cp -f ${srcdir}/main.py ${pkgdir}${_prefix}/data/org.acestream.media/main.py
+	cp -f ${srcdir}/$_bin ${pkgdir}${_prefix}/$_bin
+	ln -sf ${_prefix}/$_bin ${pkgdir}/usr/bin/$_bin
+}
