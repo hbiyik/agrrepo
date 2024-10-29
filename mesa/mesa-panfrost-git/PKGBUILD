@@ -52,7 +52,7 @@ pkgver() {
 build() {
   CFLAGS+=' -Wno-error=format'
   # rm -rf build
-  arch-meson mesa build \
+  arch-meson --reconfigure mesa build \
     -Dgallium-vdpau=disabled \
     -Dgallium-va=disabled \
     -Dgallium-xa=disabled \
