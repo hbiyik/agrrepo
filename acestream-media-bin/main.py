@@ -8,6 +8,7 @@ import re
 DNSSERVERS=["8.8.8.8"]
 RESOLVER = dns.resolver.Resolver()
 RESOLVER.nameservers=DNSSERVERS
+DEBUG=0
 
 
 def isipv4(adr):
@@ -21,10 +22,12 @@ def gethostbyname(name=''):
     try:
         answer = RESOLVER.resolve(name)
     except dns.resolver.NXDOMAIN:
-        print("Cant't resolve %s" % name)
+        if DEBUG:
+            print("Cant't resolve %s" % name)
         return
     host=answer[0].address
-    print("Resolved %s to %s" % (name, host))
+    if DEBUG:
+        print("Resolved %s to %s" % (name, host))
     return host
 
 def getipnodebyname(name, *args, **kwargs):
@@ -96,9 +99,7 @@ class Android:
     return
 
   def _fake_rpc(self, method, *args):
-    print(method, *args)
     if hasattr(Android, method):
-      print(getattr(Android, method))
       return getattr(Android, method)(self, *args)
     raise Exception("Unknown method: %s" % (method,))
 

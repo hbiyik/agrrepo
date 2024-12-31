@@ -3,9 +3,10 @@
 _arch1=armv7
 _arch2=armeabi-v7a
 _pkgver=3.1.80.0
-_modver=1
+_modver=2
 _bin=acestreamengine
-pkgname=acestream-media-bin
+_pkgname=acestream-media
+pkgname=$_pkgname-bin
 pkgver=$_pkgver.$_modver
 pkgrel=1
 pkgdesc='Acestream Media Service'
@@ -21,14 +22,16 @@ source=(acestream.apk::https://github.com/hbiyik/agrrepo/releases/download/acest
         dns.tar.gz::https://github.com/rthalley/dnspython/releases/download/v2.6.1/dnspython-2.6.1.tar.gz
         tzdata::https://github.com/hbiyik/agrrepo/releases/download/acestream-media-bin/tzdata
         main.py
-        $_bin)
+        $_bin
+        service)
 
 sha256sums=('1fcc7abc0a13933578a950cfcc6f684e98b614542c77efef93e9a4399f157c54'
             'c30ce0d797058ae573f26d9347e5cdac5856fac64b12d5eda78a6224baa9dfde'
             'e8f0f9c23a7b7cb99ded64e6c3a6f3e701d78f50c55e002b839dea7225cff7cc'
             '8a107a8ba7347ef4e6d659b0d1d60057453ae9aa7d0131deb682f5493d3e9f9e'
-            '84361b0b3423ab7e2c9a903be8d778048ff62d9a8729b591f389e8577e3bc66f'
-            '757fed87b2e9d239a34b47138703bd76a40e19ab4af42ddbc5adb7adafd42d72')
+            '9e07af675ea4dc47b091c06a69cf16899e8781ae539519b73bd0ec0ed3a22ea2'
+            '757fed87b2e9d239a34b47138703bd76a40e19ab4af42ddbc5adb7adafd42d72'
+            'fa42469697f5e53554095aa490014cd0d5385405155490b60697234480ba2d74')
 
 
 package() {
@@ -59,4 +62,5 @@ package() {
 	cp -f ${srcdir}/main.py ${pkgdir}${_prefix}/data/org.acestream.media/main.py
 	cp -f ${srcdir}/$_bin ${pkgdir}${_prefix}/$_bin
 	ln -sf ${_prefix}/$_bin ${pkgdir}/usr/bin/$_bin
+	install -Dm644 "service" "$pkgdir/usr/lib/systemd/system/$_pkgname.service"
 }

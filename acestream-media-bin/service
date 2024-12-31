@@ -1,0 +1,9 @@
+[Unit]
+Description=AceStream Media Service
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/acestreamengine --client-console
+
+[Install]
+WantedBy=multi-user.target 
