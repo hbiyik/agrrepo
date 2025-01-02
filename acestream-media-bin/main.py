@@ -3,13 +3,30 @@ import _socket
 import socket
 import os
 import re
+import traceback
+import sys
 
-# monkey patch socket
+DEBUG = False
+ROOTPATH = os.path.dirname(os.path.realpath(__file__))
+EGGPATH = os.path.join(ROOTPATH, "eggs")
+PLUGINPATH = os.path.join(ROOTPATH, "data", "plugins")
+
+def printd(*args):
+    if DEBUG:
+        print(*args)
+
+# make plugins importable
+sys.path.append(PLUGINPATH)
+
+# import the eggs, for some reason they dont work with pythonpath
+for p in os.listdir(EGGPATH):
+    if p.endswith(".egg"):
+        sys.path.append(os.path.join(EGGPATH, p))
+
+# monkey patch socket and dns mechanism which was meant for android
 DNSSERVERS=["8.8.8.8"]
 RESOLVER = dns.resolver.Resolver()
 RESOLVER.nameservers=DNSSERVERS
-DEBUG=0
-
 
 def isipv4(adr):
     s = re.search(r"([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)", adr)
@@ -22,12 +39,10 @@ def gethostbyname(name=''):
     try:
         answer = RESOLVER.resolve(name)
     except dns.resolver.NXDOMAIN:
-        if DEBUG:
-            print("Cant't resolve %s" % name)
+        printd("Cant't resolve %s" % name)
         return
     host=answer[0].address
-    if DEBUG:
-        print("Resolved %s to %s" % (name, host))
+    printd("Resolved %s to %s" % (name, host))
     return host
 
 def getipnodebyname(name, *args, **kwargs):
@@ -42,9 +57,27 @@ socket.gethostbyname = gethostbyname
 socket.getipnodebyname = getipnodebyname
 socket.getaddrinfo = getaddrinfo
 
-# monkey patch app_bridge
-import app_bridge
+# spoof taskmanager so that annoying 5min timout video playback stop can be bypassed
+from ACEStream.Utilities import TimedTaskQueue
 
+SKIPTASKS = ["remove_playing_download_wrapper"]
+
+def faketask(*args, **kwargs):
+    return
+
+class NewTimedTaskQueue(TimedTaskQueue.TimedTaskQueue):
+    def add_task(self, *args, **kwargs):
+        printd("task added", args, kwargs)
+        if len(args) and hasattr(args[0], "__name__") and args[0].__name__ in SKIPTASKS:
+            printd("task skipped", args, kwargs)
+            args = list(args)
+            args[0] = faketask
+        super().add_task(*args, **kwargs)
+
+TimedTaskQueue.TimedTaskQueue = NewTimedTaskQueue
+
+# monkey patch app_bridge to spoof fake android behaviour
+import app_bridge
 
 class Android:
   def getAceStreamHome(self, *args, **kwargs):
@@ -98,9 +131,16 @@ class Android:
   def getMemoryClass(self, *args, **kwargs):
     return
 
+  def getAvailableBlocks(self):
+      return 0
+
+  def startInternalActivity(self, *args, **kwargs):
+      return
+
   def _fake_rpc(self, method, *args):
     if hasattr(Android, method):
       return getattr(Android, method)(self, *args)
+    print("Unknown RPC:", method, *args)
     raise Exception("Unknown method: %s" % (method,))
 
 
@@ -108,6 +148,8 @@ for k, v in vars(Android).items():
     if k.startswith("__"):
         continue
     setattr(app_bridge.Android, k, v)
+
+# import actual acestream core function
 
 import sys
 from acestreamengine import Core

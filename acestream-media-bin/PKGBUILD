@@ -3,7 +3,7 @@
 _arch1=armv7
 _arch2=armeabi-v7a
 _pkgver=3.1.80.0
-_modver=2
+_modver=3
 _bin=acestreamengine
 _pkgname=acestream-media
 pkgname=$_pkgname-bin
@@ -29,10 +29,9 @@ sha256sums=('1fcc7abc0a13933578a950cfcc6f684e98b614542c77efef93e9a4399f157c54'
             'c30ce0d797058ae573f26d9347e5cdac5856fac64b12d5eda78a6224baa9dfde'
             'e8f0f9c23a7b7cb99ded64e6c3a6f3e701d78f50c55e002b839dea7225cff7cc'
             '8a107a8ba7347ef4e6d659b0d1d60057453ae9aa7d0131deb682f5493d3e9f9e'
-            '9e07af675ea4dc47b091c06a69cf16899e8781ae539519b73bd0ec0ed3a22ea2'
-            '757fed87b2e9d239a34b47138703bd76a40e19ab4af42ddbc5adb7adafd42d72'
+            'c3450d4fc6a5fd782c7032c89a9dc712dde8c869212a6fbe508b51aa2b47e096'
+            'cf65e9fedcea2aefb51895313d0cbd69a3e9dda939d8824aa04714801dab5f5a'
             'fa42469697f5e53554095aa490014cd0d5385405155490b60697234480ba2d74')
-
 
 package() {
 	_prefix="/usr/lib/acestream"

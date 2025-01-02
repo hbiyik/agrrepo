@@ -6,7 +6,7 @@ ANDROID_ROOT=/system
 ANDROID_DATA=/data
 ACEPATH=/data/org.acestream.media
 PYTHON_HOME=$ACEPATH/python/lib
-PYTHON_PATH=$ACEPATH/python/lib/stdlib.zip:$ACEPATH/python/lib/modules:$ACEPATH/data
+PYTHON_PATH=$ACEPATH/python/lib/stdlib.zip:$ACEPATH/python/lib/modules:$PYTHON_PATH:$ACEPATH/modules.zip
 
 systemd-nspawn -D $ROOTFS \
  -E LD_LIBRARY_PATH=/data/org.acestream.media/python/lib \
