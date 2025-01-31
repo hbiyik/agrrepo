@@ -3,4 +3,6 @@
 *src
 *pkg
 *.project
+*.pydevproject
 .gitweb
+.gitignore
