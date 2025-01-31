@@ -21,7 +21,7 @@ makedepends=('cpio' 'xmlto' 'docbook-xsl' 'kmod' 'inetutils' 'bc' 'git' 'gitweb-
 options=('!strip')
 DLAGENTS+=('gitweb-dlagent::/usr/bin/gitweb-dlagent sync %u')
 source=(
-  "git+file:///home/boogie/src/linux#branch=$_branch"
+  "$_url_git#branch=$_branch"
   'kernel.config'
 )
 
