@@ -2,10 +2,9 @@
 # Maintainer boogieeeee <boogiepop AT gmx DOT com>
 #
 _codename=Omega
-_xbmccommit="60c450005472e6d38929bb28c07d00589102818d"
 _cmake_release_type=Release
 pkgname=kodi-binary-addons-git
-pkgver=r23958
+pkgver=r25022
 pkgrel=1
 arch=('armv7h' 'aarch64')
 url="https://kodi.tv"
@@ -16,8 +15,7 @@ pkgdesc="All Kodi ${_codename} binary addons "
 provides=("kodi-binary-addons" "kodi-omega-binary-addons" "kodi-omega-binary-addons-git")
 conflicts=("kodi-binary-addons")
 
-# keep lto on for binary addons to link properly
-options=(strip lto)
+options=(strip !lto !debug)
 
 _addons=(
   audiodecoder.2sf
@@ -198,7 +196,7 @@ _addons_src=(
 )
 
 source=(
-  "gitweb-dlagent://github.com/xbmc/xbmc/#commit=${_xbmccommit}"
+  "gitweb-dlagent://github.com/xbmc/xbmc/#branch=${_codename}"
   "001-ffmpegdirect_zvbi.patch"
   "002-ffmpegdirect-gnutls-nettle-hogweed-linker-order.patch"
   "003-ffmpegdirect-ffmpeg-disable-asm.patch"
@@ -320,7 +318,12 @@ prepare() {
 
 build() {
   echo "Building Kodi ${_codename} Binary Addons"
-
+  unset CFLAGS
+  unset CXXFLAGS
+  unset LDFLAGS
+  unset LTOFLAGS
+  unset DEBUG_CFLAGS
+  unset DEBUG_CXXFLAGS
   for _addon in "${_addons[@]}"
   do : 
     echo "Configuring $_addon"
