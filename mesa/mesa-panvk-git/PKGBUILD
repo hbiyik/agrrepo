@@ -57,7 +57,6 @@ build() {
     -Dgallium-drivers=panfrost,zink \
     -Dvulkan-drivers=panfrost \
     -Degl=enabled \
-    -Dllvm=disabled \
     -Dintel-rt=disabled \
     -Dmicrosoft-clc=disabled \
     -Dintel-clc=auto \
@@ -83,7 +82,7 @@ package() {
   _install fakeinstall/usr/share/drirc.d/00-mesa-defaults.conf
   _install fakeinstall/usr/lib/dri/*.so
   _install fakeinstall/usr/lib/gbm/*.so
-  _install fakeinstall/usr/lib/lib{gbm,glapi}.so*
+  _install fakeinstall/usr/lib/libgbm.so*
   _install fakeinstall/usr/lib/libGL*
   _install fakeinstall/usr/lib/libEG*
   _install fakeinstall/usr/include
