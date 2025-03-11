@@ -69,3 +69,7 @@
 	path = mpp/sunshine-mpp-git
 	url = https://github.com/7Ji-PKGBUILDs/sunshine-mpp-git.git
 	branch = master
+[submodule "kernel/rockchip/linux-aarch64-rockchip-bsp6.1-armbian-git"]
+	path = kernel/rockchip/linux-aarch64-rockchip-bsp6.1-armbian-git
+	url = https://github.com/7Ji-PKGBUILDs/linux-aarch64-rockchip-bsp6.1-armbian-git.git
+	branch = main
