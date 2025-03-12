@@ -18,7 +18,8 @@ makedepends=('git' 'grep')
 
 _switchcore(){
   cd ${srcdir}/$_srcname
-  _core=$(git ls-remote -b --sort -version:refname | grep -oh core[0-9]* | head -n 1)
+  #_core=$(git ls-remote -b --sort -version:refname | grep -oh core[0-9]* | head -n 1)
+  _core=core93
   git checkout release/${_core} --quiet
   git reset --hard --quiet
   printf $_core
