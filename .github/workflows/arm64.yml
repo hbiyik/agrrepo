@@ -1,0 +1,12 @@
+name: arm64_test
+on: [workflow_dispatch]
+jobs:
+  Agr-Build:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - name: Build pkg
+        uses: hbiyik/agr@master
+        with:
+          url: https://github.com/hbiyik/agrrepo.git
+          package: ffmpeg-mpp-git
+          target: alarm.aarch64
