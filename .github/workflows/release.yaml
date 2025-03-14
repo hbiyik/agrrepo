@@ -1,0 +1,100 @@
+name: release
+on: [workflow_dispatch]
+jobs:
+  getassets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: robinraju/release-downloader@v1
+        with:
+          tag: 'alarm-aarch64'
+          fileName: '*'
+          out-file-path: 'oldassets'
+      - run: ls -lah ${{ github.workspace }}/oldassets
+      - uses: actions/upload-artifact@v4
+        with:
+          name: old-assets
+          path: oldassets
+
+  build:
+    needs: getassets
+    runs-on: ubuntu-24.04-arm
+    continue-on-error: true
+    strategy:
+      matrix:
+        package: [gitweb-dlagent,
+                  linux-aarch64-rk3588-collabora-git linux-aarch64-rk3588-collabora-git-headers,
+                  linux-aarch64-rockchip-bsp5.10-radxa-git linux-aarch64-rockchip-bsp5.10-radxa-git-headers,
+                  linux-aarch64-rockchip-bsp6.1-armbian-git linux-aarch64-rockchip-bsp6.1-armbian-git-headers,
+                  linux-aarch64-rockchip-bsp6.1-joshua-git linux-aarch64-rockchip-bsp6.1-joshua-git-headers,
+                  linux-aarch64-rockchip-bsp6.1-boogie-git linux-aarch64-rockchip-bsp6.1-boogie-headers-git linux-aarch64-rockchip-bsp6.1-boogie-dtb-git linux-aarch64-rockchip-bsp6.1-boogie-openvfd-git,
+                  librga-multi,
+                  acestream-media-bin,
+                  8852be-dkms-git,
+                  8852bu-dkms-git,
+                  iwlwifi-backport-dkms-git,
+                  r8125-dkms-git,
+                  dri2to3-git,
+                  bcm4335-firmware,
+                  gl4es-git,
+                  kodi-mpp-git,
+                  kodi-binary-addons-git,
+                  libmali-valhall-g610-base libmali-valhall-g610-dummy libmali-valhall-g610-gbm libmali-valhall-g610-x11-gbm libmali-valhall-g610-wayland-gbm libmali-valhall-g610-x11-wayland-gbm,
+                  mesa-panvk-git,
+                  mesa-panfork-git,
+                  mpp-git,
+                  ffmpeg-mpp-git,
+                  firefox-mpp,
+                  libv4l-rkmpp-git,
+                  v4l-utils-mpp,
+                  sunshine-mpp-git] 
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: old-assets
+          path: agr/tarballs/native/repo
+      - name: prepare old packages to upload in case of failure
+        run: |
+          mkdir -p upload
+          packages='${{ matrix.package }}'
+          for package in ${packages}; do
+            cp -rf agr/tarballs/native/repo/$package-*.pkg.* upload/ || true
+          done
+      - name: Build ${{ matrix.package }}
+        uses: hbiyik/agr@master
+        with:
+          package: ${{ matrix.package }}
+          skippgpcheck: true
+      - name: prepare built packages to upload
+        if: always()
+        run: |
+          mkdir -p upload
+          packages='${{ matrix.package }}'
+          for package in ${packages}; do
+            cp -rf agr/tarballs/native/repo/$package-*.pkg.* upload/ || true
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: build-${{ matrix.package }}
+          path: upload/*
+          if-no-files-found: error
+
+  genrepo:
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: build-*
+          path: repo
+          merge-multiple: true
+      - run: ls -lah repo
+      - uses: actions/checkout@v4
+        with:
+          path: agrrepo
+      - uses: ./agrrepo/.github/actions/sync
+        with:
+          tag: alarm-aarch64
+          reponame: boogie
