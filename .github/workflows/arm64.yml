@@ -1,0 +1,14 @@
+name: arm64_test
+on: [workflow_dispatch]
+jobs:
+  Explore-GitHub-Actions:
+    runs-on: ubuntu-24.04-arm
+    container:
+      image: docker://menci/archlinuxarm:base-devel
+    steps:
+      - name: Check
+        run: |
+          pacman -Sy sudo --noconfirm
+          echo "ALL ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/all
+          useradd -m alarm
+          sudo -u whoami
