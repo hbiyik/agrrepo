@@ -9,4 +9,4 @@ The [agr](https://github.com/hbiyik/agr) tool is necessary to make use of this r
 
 # Tips:
 
-- Compiling on low-power devices can take a lot longer. You can shorten it by utilizing [distcc](https://wiki.archlinux.org/title/Distcc).
+- Compiling on low-power devices can take a lot longer. You can shorten it by running agr in arm containers https://github.com/hbiyik/agr?tab=readme-ov-file#advanced-usage-and-containers
