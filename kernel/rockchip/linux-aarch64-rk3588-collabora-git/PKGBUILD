@@ -13,7 +13,7 @@ license=('GPL2')
 makedepends=('kmod' 'bc' 'dtc' 'uboot-tools')
 options=(!strip)
 
-source=("git+$url#branch=rk3588" 'config' 'extlinux.collabora.template')
+source=("git+$url" 'config' 'extlinux.collabora.template')
 sha256sums=('SKIP' 'SKIP' 'SKIP')
 
 pkgver() {
