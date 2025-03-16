@@ -7,4 +7,4 @@ jobs:
       - name: Build pkg
         uses: hbiyik/agr@master
         with:
-          package: librga-multi acestream-media-bin
+          package: firefox-mpp
