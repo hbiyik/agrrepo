@@ -7,6 +7,4 @@ jobs:
       - name: Build pkg
         uses: hbiyik/agr@master
         with:
-          url: https://github.com/hbiyik/agrrepo.git
-          package: ffmpeg-mpp-git
-          target: alarm.aarch64
+          package: librga-multi
