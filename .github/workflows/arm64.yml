@@ -8,3 +8,4 @@ jobs:
         uses: hbiyik/agr@master
         with:
           package: firefox-mpp
+          skippgpcheck: true
