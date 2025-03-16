@@ -1,0 +1,13 @@
+name: release
+on: [workflow_dispatch]
+jobs:
+  build:
+    runs-on: ubuntu-24.04-arm
+    strategy:
+      matrix:
+        package: [librga-multi, acestream-media-bin]
+    steps:
+      - name: Build ${{ matrix.package }}
+        uses: hbiyik/agr@master
+        with:
+          package: ${{ matrix.package }}
