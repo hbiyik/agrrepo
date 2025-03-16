@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-24.04-arm
     strategy:
       matrix:
-        package: [librga-multi, acestream-media-bin]
+        package: [gitweb-dlagent, linux-aarch64-rk3588-collabora-git, linux-aarch64-rockchip-bsp5.10-radxa-git, linux-aarch64-rockchip-bsp6.1-armbian-git, linux-aarch64-rockchip-bsp6.1-boogie-git, linux-aarch64-rockchip-bsp6.1-boogie-dtb-git, linux-aarch64-rockchip-bsp6.1-boogie-openvfd-git, linux-aarch64-rockchip-bsp6.1-joshua-git, librga-multi, acestream-media-bin, 8852be-dkms-git, 8852bu-dkms-git, iwlwifi-backport-dkms-git, r8125-dkms-git, dri2to3-git, bcm4335-firmware, gl4es-git, kodi-mpp-git, kodi-binary-addons-git, libmali-valhall-g610, mesa-panvk-git, mesa-panfork-git, mpp-git, ffmpeg-mpp-git, firefox-mpp, libv4l-rkmpp-git, v4l-utils-mpp, sunshine-mpp-git, chromium-mpp] 
     steps:
       - name: Build ${{ matrix.package }}
         uses: hbiyik/agr@master
