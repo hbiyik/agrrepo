@@ -2,6 +2,7 @@ import os
 import subprocess
 import requests
 import re
+import urllib3
 from packaging.version import Version
 
 REPOPATH = os.path.join(os.environ["GITHUB_WORKSPACE"], os.environ["REPOPATH"])
@@ -15,6 +16,7 @@ SERVER = "github.com"
 APIVER = "2022-11-28"
 
 VERSION_SEPS = [":", "-", "+", "_", "@"]
+urllib3.disable_warnings()
 
 
 def querygithub(method, path, subdomain="api", data=None, json=True, headers=None):
@@ -25,7 +27,8 @@ def querygithub(method, path, subdomain="api", data=None, json=True, headers=Non
     if headers:
         for k, v in headers.items():
             h[k] = v
-    resp = requests.request(method, u, headers=h, data=data, json=json)
+    resp = requests.request(method, u, headers=h, data=data, json=json, verify=False)
+    # https://github.com/python/cpython/issues/115627, until this is fixed and rolled out, bypass client auth.
     next = resp.headers.get("link")
     if next:
         next = re.search(r'<(.+?)>; rel="next"', next)
@@ -71,9 +74,18 @@ def updaterelease(name, body, draft=False, prerelease=False):
 
 def getlocalpackages():
     local_packages = {}
-    for filename in os.listdir(REPOPATH):
-        if ".pkg." in filename:
+    for found_filename in os.listdir(REPOPATH):
+        if ".pkg." in found_filename:
+            found_pkgpath = os.path.join(REPOPATH, found_filename)
+            filename = found_filename.replace(":", ".")
             pkgpath = os.path.join(REPOPATH, filename)
+            if not found_pkgpath == pkgpath:
+                print(f"Renaming {found_pkgpath} -> {pkgpath}")
+                os.replace(found_pkgpath, pkgpath)
+            if "-debug-" in filename:
+                print(f"Removing debug package {pkgpath}")
+                os.remove(pkgpath)
+                continue
             prename, _pkgext = filename.split(".pkg.")
             splits = prename.split("-")
             _arch = splits.pop(-1)
