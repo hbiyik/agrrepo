@@ -77,3 +77,7 @@
 	path = dolphin-emu
 	url = https://gitlab.archlinux.org/archlinux/packaging/packages/dolphin-emu.git
 	branch = main
+[submodule "agr"]
+	path = agr
+	url = https://github.com/hbiyik/agr.git
+	branch = master

@@ -55,7 +55,8 @@ jobs:
                   libv4l-rkmpp-git,
                   v4l-utils-mpp,
                   sunshine-mpp-git,
-                  dolphin-emu dolphin-emu-tool]
+                  dolphin-emu dolphin-emu-tool,
+                  agr-git]
     steps:
       - uses: actions/download-artifact@v4
         with:
