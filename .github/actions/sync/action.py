@@ -19,6 +19,14 @@ VERSION_SEPS = [":", "-", "+", "_", "@"]
 urllib3.disable_warnings()
 
 
+def runprocess(*args, **kwargs):
+    proc = subprocess.Popen(*args, **kwargs)
+    proc.wait()
+    if not proc.returncode == 0:
+        cmd = " ".join(args)
+        raise RuntimeError(f"{cmd} returned {proc.returncode}")
+
+
 def querygithub(method, path, subdomain="api", data=None, json=True, headers=None):
     u = f"https://{subdomain}.{SERVER}/repos/{OWNER}/{REPO}/{path}" if not path.startswith("https://") else path
     h = {"Accept": "application/vnd.github+json",
@@ -27,8 +35,7 @@ def querygithub(method, path, subdomain="api", data=None, json=True, headers=Non
     if headers:
         for k, v in headers.items():
             h[k] = v
-    resp = requests.request(method, u, headers=h, data=data, json=json, verify=False)
-    # https://github.com/python/cpython/issues/115627, until this is fixed and rolled out, bypass client auth.
+    resp = requests.request(method, u, headers=h, data=data, json=json)
     next = resp.headers.get("link")
     if next:
         next = re.search(r'<(.+?)>; rel="next"', next)
@@ -56,13 +63,14 @@ def delasset(assetid):
 
 
 def uploadasset(name, path):
-    with open(path, "rb") as f:
-        data = f.read()
-    return querygithub("POST", f"releases/{RELID}/assets?name={name}",
-                       subdomain="uploads",
-                       data=data,
-                       json=None,
-                       headers={"Content-Type": "application/octet-stream"})[1]
+    # using curl here due to Python bug: https://github.com/python/cpython/issues/115627
+    runprocess(["curl", "-L", "-s", "-X" "POST", "-o", "/dev/null",
+                "-H", "Accept: application/vnd.github+json",
+                "-H", f"Authorization: Bearer {TOKEN}",
+                "-H", f"X-GitHub-Api-Version: {APIVER}",
+                "-H", "Content-Type: application/octet-stream",
+                f"https://uploads.{SERVER}/repos/{OWNER}/{REPO}/releases/{RELID}/assets?name={name}",
+                "--data-binary", f"@{path}"], cwd=REPOPATH)
 
 
 def updaterelease(name, body, draft=False, prerelease=False):
@@ -115,9 +123,7 @@ def getlocalpackages():
 
 def genrepo(*args):
     print(f"Generating Repo {REPONAME}")
-    for line in subprocess.check_output(["repo-add", "-R", f"{REPONAME}.db.{PKGEXT}", *args],
-                                        cwd=REPOPATH).decode().split("\n"):
-        print(line)
+    runprocess(["repo-add", "-R", f"{REPONAME}.db.{PKGEXT}", *args], cwd=REPOPATH)
     return [f"{REPONAME}.db",
             f"{REPONAME}.db.{PKGEXT}",
             f"{REPONAME}.files",
