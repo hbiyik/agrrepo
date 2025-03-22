@@ -56,6 +56,8 @@ arch+=("aarch64" "arm7f")
 _pkgname=firefox-mpp
 alarm_pkgname=$pkgname
 pkgname=$_pkgname
+provides=(firefox)
+conflicts=(firefox)
 
 prepare(){
   # patch with extra stuff
@@ -76,6 +78,7 @@ package(){
   # pkgname is used in the package as variable so swap it
   pkgname=$alarm_pkgname
   alarm_package
+  mv $pkgdir/usr/bin/firefox-mpp $pkgdir/usr/bin/firefox
   pkgname=$_pkgname
 }
 
