@@ -56,7 +56,8 @@ jobs:
                   v4l-utils-mpp,
                   sunshine-mpp-git,
                   dolphin-emu dolphin-emu-tool,
-                  agr-git]
+                  agr-git,
+                  mpv-mpp]
     steps:
       - uses: actions/download-artifact@v4
         with:
