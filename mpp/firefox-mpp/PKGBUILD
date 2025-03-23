@@ -64,7 +64,9 @@ prepare(){
   cd $srcdir/firefox-$pkgver
   patch -p1 -N -i ../mpp.patch
   cd $srcdir
+  pkgname=$alarm_pkgname
   alarm_prepare
+  pkgname=$_pkgname
 }
 
 build(){
@@ -78,7 +80,6 @@ package(){
   # pkgname is used in the package as variable so swap it
   pkgname=$alarm_pkgname
   alarm_package
-  mv $pkgdir/usr/bin/firefox-mpp $pkgdir/usr/bin/firefox
   pkgname=$_pkgname
 }
 
