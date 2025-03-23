@@ -1,0 +1,42 @@
+eval "$(curl -s -L https://raw.githubusercontent.com/hbiyik/agrrepo/refs/heads/master/libinherit/remote.sh)"
+inherit https://gitlab.archlinux.org/archlinux/packaging/packages/mpv/-/raw/main/
+
+_mpv_branch="mpp"
+_mpv_base="b22a4da1df113cee07ea49b49ac2737f30fc998e"
+
+arch=('x86_64' 'armv7h' 'aarch64')
+provides=('mpv' 'mpv-mpp')
+conflicts=('mpv')
+source+=("mpp.patch::https://github.com/hbiyik/mpv/compare/${_mpv_base}...${_mpv_branch}.patch")
+sha256sums+=('SKIP')
+_pkgname=mpv-mpp
+old_pkgname=$pkgname
+pkgname=$_pkgname
+
+for i in "${!depends[@]}"; do
+    if [[ ${depends[$i]} == "ffmpeg" ]]; then
+        depends[$i]="ffmpeg-mpp"
+    fi
+done
+
+
+prepare(){
+  cd $srcdir/mpv
+  patch -p1 -N -i ../mpp.patch
+  cd $srcdir
+  pkgname=$old_pkgname
+  old_prepare
+  pkgname=$_pkgname
+}
+
+build(){
+  pkgname=$old_pkgname
+  old_build
+  pkgname=$_pkgname
+}
+
+package(){
+  pkgname=$old_pkgname
+  old_package
+  pkgname=$_pkgname
+}
