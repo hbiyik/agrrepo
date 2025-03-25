@@ -32,6 +32,10 @@ inherit(){
 	# list of functions to override while keeping the old
 	_overrrides=("prepare" "build" "package")
 	for _override in ${_overrrides[@]}; do
-	  eval "`declare -f ${_override} | sed '1s/.*/old_&/'`"
+	  if [[ $(type -t $_override) == function ]]; then
+	    eval "`declare -f ${_override} | sed '1s/.*/old_&/'`"
+	  else
+	    eval "old_$_override() { true ; }"
+	  fi
 	done
 }
