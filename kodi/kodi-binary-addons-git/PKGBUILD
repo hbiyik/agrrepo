@@ -4,8 +4,8 @@
 _codename=Omega
 _cmake_release_type=Release
 pkgname=kodi-binary-addons-git
-pkgver=r25022
-pkgrel=1
+pkgver=r25077
+pkgrel=2
 arch=('armv7h' 'aarch64')
 url="https://kodi.tv"
 license=('GPL2')
@@ -324,6 +324,8 @@ build() {
   unset LTOFLAGS
   unset DEBUG_CFLAGS
   unset DEBUG_CXXFLAGS
+
+  export CMAKE_POLICY_VERSION_MINIMUM="3.5"
   for _addon in "${_addons[@]}"
   do : 
     echo "Configuring $_addon"
@@ -334,6 +336,7 @@ build() {
     -DADDONS_TO_BUILD=$_addon \
     -DADDON_SRC_PREFIX=$srcdir \
     -DCMAKE_BUILD_TYPE=$_cmake_release_type \
+    -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
     -DCMAKE_INSTALL_PREFIX="$srcdir/addon-build/$_addon/.install" \
     -DPACKAGE_ZIP=1 \
     -Wno-dev \
