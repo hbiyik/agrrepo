@@ -46,7 +46,7 @@ done
 # ------------------- START ACTUAL PKGBUILD -------------
 # override only relevant parts, so that existing PKGBUILD could be reused
 
-_gecko_base=09112edd051eaaac350e035b40661514fd1206ac
+_gecko_base=fa5b44a4ea5c98b6a15f39638ea4cd04dc271f3d
 _gecko_branch=mpp-release
 source+=("mpp.patch::https://github.com/hbiyik/gecko-dev/compare/${_gecko_base}...${_gecko_branch}.patch")
 sha256sums+=("SKIP")
