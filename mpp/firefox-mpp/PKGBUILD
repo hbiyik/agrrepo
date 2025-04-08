@@ -7,7 +7,6 @@ source+=("mpp.patch::https://github.com/hbiyik/gecko-dev/compare/${_gecko_base}.
 sha256sums+=("SKIP")
 b2sums+=("SKIP")
 arch+=("aarch64" "arm7f")
-pkgrel=$(( $pkgrel + 2 ))
 provides=(firefox)
 conflicts=(firefox)
 
