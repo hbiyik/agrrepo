@@ -15,7 +15,7 @@ PKGEXT = os.environ["PKGEXT"]
 SERVER = "github.com"
 APIVER = "2022-11-28"
 
-VERSION_SEPS = [":", "-", "+", "_", "@"]
+VERSION_SEPS = [":", "+", "_", "@"]
 urllib3.disable_warnings()
 
 
@@ -102,21 +102,23 @@ def getlocalpackages():
             pkgname = "-".join(splits)
             pkgsize = os.stat(pkgpath).st_size
             # make version compatible with packaging
-            pkgfullver = f"{pkgver}.{pkgrel}"
-            for c in VERSION_SEPS:
-                pkgfullver = pkgfullver.replace(c, ".")
-            pkgfullver = ''.join(c if c.isdigit() or c == "." else "0" for c in pkgfullver)
+            versions = [pkgver, pkgrel]
+            for i in range(len(versions)):
+                for c in VERSION_SEPS:
+                    versions[i] = versions[i].replace(c, ".")
+                versions[i] = Version(''.join(c if c.isdigit() or c == "." else "0" for c in versions[i]))
+            pkgver, pkgrel = versions
             if pkgname not in local_packages:
-                local_packages[pkgname] = pkgfullver, filename, pkgpath, pkgsize
-            elif Version(local_packages[pkgname][0]) >= Version(pkgfullver):
-                print(f"Deleting local file {filename} in favor of {local_packages[pkgname][1]} because {local_packages[pkgname][0]} >= {pkgfullver}")
+                local_packages[pkgname] = pkgver, pkgrel, filename, pkgpath, pkgsize
+            elif local_packages[pkgname][0] > pkgver or (local_packages[pkgname][0] == pkgver and local_packages[pkgname][1] > pkgrel):
+                print(f"Deleting local file {filename} in favor of {local_packages[pkgname][2]} because {local_packages[pkgname][0]}-{local_packages[pkgname][1]} >= {pkgver}-{pkgrel}")
                 os.remove(pkgpath)
             else:
-                print(f"Deleting local file {local_packages[pkgname][1]} in favor of {filename} because {pkgfullver} > {local_packages[pkgname][0]}")
-                os.remove(local_packages[pkgname][2])
-                local_packages[pkgname] = pkgfullver, filename, pkgpath, pkgsize
+                print(f"Deleting local file {local_packages[pkgname][2]} in favor of {filename} because {pkgver}-{pkgrel} > {local_packages[pkgname][0]}-{local_packages[pkgname][1]}")
+                os.remove(local_packages[pkgname][3])
+                local_packages[pkgname] = pkgver, pkgrel, filename, pkgpath, pkgsize
     packages = {}
-    for _pkgname, [pkgfullver, filename, pkgpath, pkgsize] in local_packages.items():
+    for _pkgname, [pkgver, pkgrel, filename, pkgpath, pkgsize] in local_packages.items():
         packages[filename] = pkgsize
     return packages
 
