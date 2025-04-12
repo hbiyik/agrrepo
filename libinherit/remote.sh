@@ -7,7 +7,7 @@ inherit(){
 	eval "$(curl -s -L $_pkgbuild)"
 	
 	# sync the localfiles
-	_skip_prefix=("http://" "https://" "ftp://" "file://" "scp://" "rsync://" "git+" "bzr+" "fossil+" "hg+" "svn+")
+	_skip_prefix=("http://" "https://" "ftp://" "file://" "scp://" "rsync://" "git+" "bzr+" "fossil+" "hg+" "svn+" "gitweb-dlagent://")
 	for _source in ${source[@]}; do
 	  #TODO: detect filename tags ie: somefile::https://some/url
 	  _skip=0
