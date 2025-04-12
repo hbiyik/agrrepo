@@ -1,0 +1,87 @@
+_codename=Omega
+_addongitname=${_addongitname:=$_addonname}
+_addongiturl=${_addongiturl:="github.com/xbmc"}
+_addongitbranch=${_addongitbranch:=$_codename}
+ 
+_addongitweb="gitweb-dlagent://${_addongiturl}/${_addongitname}#branch=$_addongitbranch"
+_cmake_release_type=Release
+_pkgname=kodi-addon-${_addonname//./-}
+
+pkgname=$_pkgname-git
+pkgver="r$(gitweb-dlagent version ${_addongitweb} --pattern \{revision\})"."$(gitweb-dlagent version ${_addongitweb} --pattern \{commit:.8s\})"
+pkgrel=1
+arch=('armv7h' 'aarch64' 'x86_64' 'i686')
+url="https://kodi.tv"
+license=('GPL2')
+makedepends=('git' 'cmake' 'kodi-platform' 'gitweb-dlagent' 'gperf')
+depends=('kodi')
+pkgdesc="$_addonname binary addon for kodi ${_codename}"
+provides=("kodi-binary-addons" "kodi-omega-binary-addons" "kodi-omega-binary-addons-git" $_pkgname)
+conflicts=($_pkgname $_pkgname-any)
+
+options=(strip !lto !debug)
+
+DLAGENTS+=('gitweb-dlagent::/usr/bin/gitweb-dlagent sync %u')
+
+source=(
+  "gitweb-dlagent://github.com/xbmc/xbmc#branch=${_codename}"
+  $_addongitweb
+)
+
+b2sums=('SKIP' 'SKIP')
+
+prepare() {
+  mkdir -p "$srcdir/addon-build"
+  mkdir -p "$srcdir/tmp"
+}
+
+build() {
+  unset CFLAGS
+  unset CXXFLAGS
+  unset LDFLAGS
+  unset LTOFLAGS
+  unset DEBUG_CFLAGS
+  unset DEBUG_CXXFLAGS
+
+  export CMAKE_POLICY_VERSION_MINIMUM="3.5"
+
+  mkdir -p "$srcdir/addon-build/$_addonname"
+  cd "$srcdir/addon-build/$_addonname"
+    
+  TMPDIR="$srcdir/tmp" cmake \
+  -DADDONS_TO_BUILD=$_addonname \
+  -DADDON_SRC_PREFIX=$srcdir \
+  -DCMAKE_BUILD_TYPE=$_cmake_release_type \
+  -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+  -DCMAKE_INSTALL_PREFIX="$srcdir/addon-build/$_addonname/.install" \
+  -DPACKAGE_ZIP=1 \
+  -Wno-dev \
+  "$srcdir/xbmc/cmake/addons"
+
+   cd "$srcdir/addon-build/$_addonname"
+   make
+}
+
+_install_binary_addon() {
+  if [ -d $2 ]; then
+    echo "Installing $1"
+    mkdir -p $3
+    cp -rf $2/* $3/
+  else
+   echo "Skipping $1"
+  fi
+}
+
+package() {
+  pkgdesc="$_addonname binary addon for kodi ${_codename}"
+  cd $srcdir/addon-build
+
+  if [ $_addonname = "screensavers.rsxs" ]; then
+    for _subaddon in $srcdir/addon-build/$_addonname/.install/screensaver.rsxs.*; do
+      _subaddon_name="$(basename ${_subaddon})"
+      _install_binary_addon $_subaddon_name $_subaddon "$pkgdir/usr/lib/kodi/addons/$_subaddon_name" 
+    done
+  else
+    _install_binary_addon $_addonname $srcdir/addon-build/$_addonname/.install/$_addonname "$pkgdir/usr/lib/kodi/addons/$_addonname"
+  fi
+}

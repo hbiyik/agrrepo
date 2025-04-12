@@ -1,0 +1,5 @@
+_addonname="pvr.plutotv"
+_addongiturl="github.com/kodi-pvr"
+
+eval "$(curl -s -L https://raw.githubusercontent.com/hbiyik/agrrepo/refs/heads/master/libinherit/remote.sh)"
+inherit https://raw.githubusercontent.com/hbiyik/agrrepo/refs/heads/master/kodi/kodi-binary-addons/base/
