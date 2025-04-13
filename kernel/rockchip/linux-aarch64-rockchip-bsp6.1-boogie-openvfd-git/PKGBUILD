@@ -1,8 +1,8 @@
 # Maintainer: boogiepop <boogiepop@gmx.com>
 _base_kernel=linux-aarch64-rockchip-bsp6.1-boogie
-_kernel_max=6.1.100
-_kernel_ver=6.1.99
-_kernel_min=6.1.98
+_kernel_max=6.1.116
+_kernel_ver=6.1.115
+_kernel_min=6.1.114
 _kernel_tag=$_kernel_ver-rockchip
 
 _drvname=openvfd

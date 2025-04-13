@@ -3,7 +3,7 @@
 
 _pkgbase=linux-aarch64-rockchip-bsp6.1-boogie
 _url="github.com/hbiyik"
-_branch_prefix="linux-6.1-stan-rkr5"
+_branch_prefix="linux-6.1-develop"
 _branch="$_branch_prefix-boogie"
 _branches=("bsp" "panthor")
 _desc="boogies personal rockchip kernel"
