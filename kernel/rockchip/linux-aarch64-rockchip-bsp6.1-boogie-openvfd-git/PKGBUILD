@@ -28,7 +28,7 @@ makedepends=('git' 'findutils')
 
 pkgver() {
   cd $_srcname
-  printf r$(git rev-list --count HEAD)
+  printf $_kernel_ver.r$(git rev-list --count HEAD)
 }
 
 build() {
