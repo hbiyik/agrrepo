@@ -157,5 +157,5 @@ if __name__ == "__main__":
     localfiles = getlocalpackages()
     dbfiles = genrepo(*list(localfiles))
     for f in dbfiles:
-        localfiles[f] = os.stat(os.path.join(REPOPATH, f)).st_size
+        localfiles[f] = -1 # force update db files
     syncassets(**localfiles)
