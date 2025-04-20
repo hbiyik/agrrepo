@@ -12,7 +12,7 @@ _url_git="gitweb-dlagent://${_url}/${_srcname}.git"
 
 pkgbase=$_pkgbase-git
 pkgname=("${_pkgbase}"{-git,-headers-git})
-pkgver=6.1.99.r2554442.e009e8a7336d
+pkgver=6.1.99.r2554442
 pkgrel=1
 arch=('aarch64')
 license=('GPL2')
@@ -38,13 +38,12 @@ pkgver() {
   	_commits=$(($_commits + "$(gitweb-dlagent version ${_url_git} --pattern \{revision\})"))
   done
 
-  printf "%s.%s%s%s.r%s.%s" \
+  printf "%s.%s%s%s.r%s" \
     "$(grep '^VERSION = ' Makefile|awk -F' = ' '{print $2}')" \
     "$(grep '^PATCHLEVEL = ' Makefile|awk -F' = ' '{print $2}')" \
     "$(grep '^SUBLEVEL = ' Makefile|awk -F' = ' '{print $2}'|grep -vE '^0$'|sed 's/.*/.\0/')" \
     "$(grep '^EXTRAVERSION = ' Makefile|awk -F' = ' '{print $2}'|tr -d -|sed -E 's/rockchip[0-9]+//')" \
-    "$_commits" \
-    "$(gitweb-dlagent version ${_url_git}#branch=$_branch --pattern \{commit:.12s\})"
+    "$_commits"
 }
 
 prepare() {
