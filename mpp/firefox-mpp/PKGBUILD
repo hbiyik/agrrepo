@@ -1,7 +1,7 @@
 eval "$(curl -s -L https://raw.githubusercontent.com/hbiyik/agrrepo/refs/heads/master/libinherit/remote.sh)"
 inherit https://raw.githubusercontent.com/archlinuxarm/PKGBUILDs/master/extra/firefox/
 
-_gecko_base=fa5b44a4ea5c98b6a15f39638ea4cd04dc271f3d
+_gecko_base=4c065f1df299065c305fb48b36cdae571a43d97c
 _gecko_branch=mpp-release
 source+=("mpp.patch::https://github.com/hbiyik/gecko-dev/compare/${_gecko_base}...${_gecko_branch}.patch")
 sha256sums+=("SKIP")
