@@ -52,6 +52,7 @@ build() {
   arch-meson --reconfigure mesa build \
     -Dgallium-vdpau=disabled \
     -Dgallium-va=disabled \
+    -Dgallium-mediafoundation=disabled \
     -Dandroid-libbacktrace=disabled \
     -Dgallium-drivers=llvmpipe,nouveau,freedreno,etnaviv,lima,panfrost,tegra,v3d,vc4,panfrost,zink \
     -Dvulkan-drivers=freedreno,panfrost \
