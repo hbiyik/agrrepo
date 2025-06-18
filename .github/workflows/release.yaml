@@ -50,7 +50,7 @@ jobs:
                   mesa-panvk-git,
                   mesa-panfork-git,
                   mpp-git,
-                  ffmpeg-mpp-git,
+                  ffmpeg-mpp,
                   firefox-mpp,
                   libv4l-rkmpp-git,
                   v4l-utils-mpp,

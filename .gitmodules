@@ -53,10 +53,6 @@
 	path = kodi/kodi-mpp-git
 	url = https://github.com/7Ji-PKGBUILDs/kodi-mpp-git.git
 	branch = gitweb
-[submodule "ffmpeg-mpp-git"]
-	path = mpp/ffmpeg-mpp-git
-	url = https://github.com/7Ji-PKGBUILDs/ffmpeg-mpp-git.git
-	branch = gitweb
 [submodule "kernel/rockchip/linux-aarch64-rockchip-bsp5.10-radxa-git"]
 	path = kernel/rockchip/linux-aarch64-rockchip-bsp5.10-radxa-git
 	url = https://github.com/7Ji-PKGBUILDs/linux-aarch64-rockchip-bsp5.10-radxa-git.git
@@ -81,3 +77,7 @@
 	path = agr
 	url = https://github.com/hbiyik/agr.git
 	branch = master
+[submodule "mpp/ffmpeg-mpp"]
+	path = mpp/ffmpeg-mpp
+	url = https://github.com/7Ji-PKGBUILDs/ffmpeg-mpp-git.git
+	branch = gitweb
