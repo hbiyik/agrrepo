@@ -16,7 +16,7 @@ Below is a simple example on how to use it with `agr`
 agr rem set boogie https://github.com/hbiyik/agrrepo.git
 agr sync --noconfirm
 agr build mpp-git 
-``
+```
 
 # Using it as binary repository:
 
