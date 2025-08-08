@@ -59,13 +59,11 @@ build() {
     -Degl=enabled \
     -Dintel-rt=disabled \
     -Dmicrosoft-clc=disabled \
-    -Dintel-clc=auto \
     -Dplatforms=wayland,x11 \
     -Dgbm=enabled \
     -Dgles1=disabled \
     -Dgles2=enabled \
     -Dglx=dri \
-    -Dshared-glapi=enabled \
     -Dglvnd=enabled
 
   ninja -C build
