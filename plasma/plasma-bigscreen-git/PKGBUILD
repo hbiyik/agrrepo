@@ -1,0 +1,52 @@
+# Maintainer: Archie Meng <archiemeng@protonmail.com>
+pkgname=plasma-bigscreen-git
+pkgver=r1162.1e788025
+pkgrel=1
+pkgdesc="A big launcher giving you easy access to any installed apps and skills."
+arch=('any')
+url="https://plasma-bigscreen.org/"
+license=('GPL2')
+groups=()
+depends=('kdeconnect' 
+         'plasma-nm' 
+         'plasma-pa' 
+         'plasma-nano'
+         'bluez-qt'
+         'qt6-webengine'
+         )
+
+makedepends=('cmake' 'extra-cmake-modules' 'git') 
+optdepends=('libcec: add USB-CEC support in order to be controlled by TV remotes'
+            'plasma-remotecontrollers: add setting tab for remote controllers')
+provides=('plasma-bigscreen')
+conflicts=('plasma-bigscreen')
+replaces=()
+backup=()
+options=()
+install=
+source=('git+https://invent.kde.org/plasma/plasma-bigscreen.git'
+        "plasmaver.patch")
+noextract=()
+md5sums=('SKIP' "SKIP")
+
+pkgver() {
+	cd "$srcdir/plasma-bigscreen"
+	printf "r%s.%s\n" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+prepare() {
+    patch -N -p0 -i plasmaver.patch
+}
+
+build() {
+	cd "$srcdir/plasma-bigscreen"
+	cmake -B build \
+	      -DCMAKE_INSTALL_PREFIX="/usr" \
+      	  -DCMAKE_BUILD_TYPE=Release 
+
+    cmake --build build --target all
+}
+
+package() {
+	cmake --install "$srcdir/plasma-bigscreen/build" --prefix "$pkgdir/usr"
+}
