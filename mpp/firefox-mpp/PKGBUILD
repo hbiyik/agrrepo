@@ -1,5 +1,7 @@
+# use slightly older vesion 139.0.1 since 140.x has major video decoding differences and mpp patch needs to be rewritten
+_pkgbuild_base=3e28f44b9a89ad7282f4757de2cdd8371793cd38
 eval "$(curl -s -L https://raw.githubusercontent.com/hbiyik/agrrepo/refs/heads/master/libinherit/remote.sh)"
-inherit https://raw.githubusercontent.com/archlinuxarm/PKGBUILDs/master/extra/firefox/
+inherit https://raw.githubusercontent.com/archlinuxarm/PKGBUILDs/$_pkgbuild_base/extra/firefox/
 
 _gecko_base=4c065f1df299065c305fb48b36cdae571a43d97c
 _gecko_branch=mpp-release
