@@ -11,6 +11,7 @@ b2sums+=("SKIP")
 arch+=("aarch64" "arm7f")
 provides=(firefox)
 conflicts=(firefox)
+pkgrel=2
 
 _pkgname=firefox-mpp
 old_pkgname=$pkgname
