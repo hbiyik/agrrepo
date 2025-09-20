@@ -50,7 +50,6 @@ build() {
   CFLAGS+=' -Wno-error=format'
   # rm -rf build
   arch-meson --reconfigure mesa build \
-    -Dgallium-vdpau=disabled \
     -Dgallium-va=disabled \
     -Dgallium-mediafoundation=disabled \
     -Dandroid-libbacktrace=disabled \
