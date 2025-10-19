@@ -1,6 +1,7 @@
 inherit(){
 	_url="$1"
-	_pkgbuild="$_url/PKGBUILD"
+	_query="$2"
+	_pkgbuild="$_url/PKGBUILD$_query"
 	_basepath=$(dirname $BASH_SOURCE)
 	
 	# source the remote PKGBUILD
@@ -26,7 +27,7 @@ inherit(){
 	  
 	  # sync the local file if there is a change
 	  # TO-DO: only update when there is
-	  curl -L -s $_url/$_source -o $_basepath/$_source
+	  curl -L -s $_url/$_source$_query -o $_basepath/$_source
 	done
 	
 	# list of functions to override while keeping the old
