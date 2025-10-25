@@ -58,7 +58,20 @@ jobs:
                   dolphin-emu dolphin-emu-tool,
                   agr-git,
                   mpv-mpp,
-                  plasma-nano plasma-bigscreen-git]
+                  plasma-nano plasma-bigscreen-git,
+                  ctranslate2 python-ctranslate2,
+                  espeak-ng-git,
+                  onednn,
+                  onnxruntime-cpu python-onnxruntime-cpu,
+                  python-piper-tts-git,
+                  python-piper-tts-legacy,
+                  python-av,
+                  python-faster-whisper,
+                  python-sentence-stream-git,
+                  python-tokenizers,
+                  python-wyoming,
+                  python-wyoming-faster-whisper,
+                  python-wyoming-piper]
     steps:
       - uses: actions/download-artifact@v4
         with:

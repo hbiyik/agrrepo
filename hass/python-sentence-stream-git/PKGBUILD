@@ -1,0 +1,32 @@
+_pkgname=sentence-stream
+_pyname=python-$_pkgname
+pkgname=$_pyname-git
+pkgdesc="A small sentence splitter for text streams"
+pkgver=r9.f97a0a5
+pkgrel=1
+arch=(any)
+url="https://github.com/OHF-Voice/sentence-stream"
+license=('MIT')
+depends=(python python-regex)
+provides=("$_pyname")
+conflicts=("$_pyname")
+makedepends=('git' 'python-build' 'python-installer' 'python-wheel' 'python-setuptools')
+source=("git+${url}.git")
+sha512sums=('SKIP')
+
+pkgver(){
+  cd $_pkgname
+  printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+build() {
+  cd $_pkgname
+  python -m build --wheel --no-isolation
+}
+
+package() {
+  cd $_pkgname
+  python -m installer --destdir="$pkgdir" dist/*.whl
+
+  install -Dm644 LICENSE.md "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

@@ -1,0 +1,19 @@
+[Unit]
+Description=Wyoming Server for Piper
+Wants=network.target
+
+[Service]
+Restart=on-failure
+StateDirectory=wyoming-piper
+WorkingDirectory=/var/lib/wyoming-piper
+
+EnvironmentFile=/etc/conf.d/wyoming-piper
+ExecStart=python3 -m wyoming_piper \
+    --piper '/usr/bin/piper-tts' \
+    --uri $URI \
+    --voice $VOICE \
+    --data-dir /var/lib/wyoming-piper/data \
+    --download-dir /var/lib/wyoming-piper/data
+
+[Install]
+WantedBy=multi-user.target
