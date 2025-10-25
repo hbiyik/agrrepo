@@ -3,6 +3,7 @@ inherit(){
 	_query="$2"
 	_pkgbuild="$_url/PKGBUILD$_query"
 	_basepath=$(dirname $BASH_SOURCE)
+	echo "WARNING: Sourcing remote PKGBUILD at {$_pkgbuild}"
 	
 	# source the remote PKGBUILD
 	eval "$(curl -s -L $_pkgbuild)"
