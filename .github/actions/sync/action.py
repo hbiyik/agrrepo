@@ -51,11 +51,14 @@ RELID = querygithub("GET", f"releases/tags/{TAG}")[1]["id"]
 
 
 def iterassets():
+    cache = []
     next = f"releases/{RELID}/assets"
     while next:
         next, assets = querygithub("GET", next)
         for asset in assets:
-            yield asset
+            if asset["name"] not in cache:
+                yield asset
+                cache.append(asset["name"])
 
 
 def delasset(assetid):
@@ -133,7 +136,8 @@ def genrepo(*args):
 
 
 def syncassets(**localfiles):
-    for asset in iterassets():
+    assets = list(iterassets())
+    for asset in assets:
         if asset["name"] not in localfiles:
             print(f'Deleting remote asset {asset["name"]} with size {asset["size"]} because no such local file exists')
             delasset(asset["id"])
