@@ -36,11 +36,12 @@ def querygithub(method, path, subdomain="api", data=None, json=True, headers=Non
         for k, v in headers.items():
             h[k] = v
     resp = requests.request(method, u, headers=h, data=data, json=json)
-    next = resp.headers.get("link")
-    if next:
-        next = re.search(r'<(.+?)>; rel="next"', next)
+    next = None
+    for substr in resp.headers.get("link", "").split(","):
+        next = re.search(r'<(.+?)>; rel="next"', substr)
         if next:
             next = next.group(1)
+            break
     if not resp.status_code >= 200 or not resp.status_code < 300:
         raise RuntimeError(f"{resp.status_code}:{u}:{resp.content}")
     ret = resp.json() if method not in ["DELETE"] else resp
