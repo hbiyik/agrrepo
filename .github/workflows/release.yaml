@@ -71,7 +71,9 @@ jobs:
                   python-tokenizers,
                   python-wyoming,
                   python-wyoming-faster-whisper,
-                  python-wyoming-piper]
+                  python-wyoming-piper,
+                  home-assistant-core,
+                  python-home-assistant-frontend]
     steps:
       - uses: actions/download-artifact@v4
         with:
