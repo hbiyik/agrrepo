@@ -73,6 +73,7 @@ jobs:
                   python-wyoming-faster-whisper,
                   python-wyoming-piper,
                   home-assistant-core,
+                  home-assistant-hacs,
                   python-home-assistant-frontend]
     steps:
       - uses: actions/download-artifact@v4
