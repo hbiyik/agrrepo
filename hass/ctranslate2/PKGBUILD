@@ -1,5 +1,5 @@
 eval "$(curl -s -L https://raw.githubusercontent.com/hbiyik/agrrepo/refs/heads/master/libinherit/remote.sh)"
-inherit https://aur.archlinux.org/cgit/aur.git/plain '?h=ctranslate2'
+inherit https://raw.githubusercontent.com/archlinux/aur/refs/heads/ctranslate2
 
 arch+=("aarch64" "armv7h")
 # remove cuda
