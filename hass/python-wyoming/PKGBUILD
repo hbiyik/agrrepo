@@ -16,7 +16,7 @@ b2sums=('SKIP')
 
 _switchtag(){
   _tag_orig=$(git tag -l --sort=creatordate | tail -1)
-  _tag=$(echo $_tag_orig | grep -o "[0-9.]*")
+  _tag=$(echo $_tag_orig | grep -o "[0-9.]*" | tr -d "\n")
   git checkout $_tag_orig --quiet
   git reset --hard --quiet
   printf $_tag

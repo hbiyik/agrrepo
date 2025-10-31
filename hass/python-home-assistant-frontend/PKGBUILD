@@ -23,7 +23,7 @@ _switchtag(){
 pkgver() {
   cd $_pkgname
   _tag=$(_switchtag)
-  printf $(echo $_tag | grep -o "[0-9.]*")
+  printf $(echo $_tag | grep -o "[0-9.]*" | tr -d "\n")
 }
 
 build() {
