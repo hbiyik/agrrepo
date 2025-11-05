@@ -3,7 +3,7 @@
 _pkgname=iwlwifi-backport
 _srcname=backport-iwlwifi
 pkgname=$_pkgname-dkms-git
-pkgver=core98.r11864
+pkgver=core96.r11655
 pkgrel=1
 pkgdesc="Backport of intel iwlwifi wireless drivers to linux LTS kernels"
 arch=('any')
@@ -18,7 +18,8 @@ makedepends=('linux-aarch64-rockchip-bsp6.1-armbian-git-headers')
 
 _switchcore(){
   cd ${srcdir}/$_srcname
-  _core=$(git ls-remote -b --sort -version:refname | grep -oh core[0-9]* | head -n 1)
+  #_core=$(git ls-remote -b --sort -version:refname | grep -oh core[0-9]* | head -n 1)
+  _core=core96
   git checkout release/${_core} --quiet
   git reset --hard --quiet
   printf $_core
