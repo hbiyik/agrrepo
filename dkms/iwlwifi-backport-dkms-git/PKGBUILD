@@ -3,7 +3,7 @@
 _pkgname=iwlwifi-backport
 _srcname=backport-iwlwifi
 pkgname=$_pkgname-dkms-git
-pkgver=core96.r11637
+pkgver=core98.r11864
 pkgrel=1
 pkgdesc="Backport of intel iwlwifi wireless drivers to linux LTS kernels"
 arch=('any')
@@ -14,12 +14,14 @@ source=(git+$url dkms.conf)
 sha256sums=('SKIP'
             'SKIP')
 depends=('dkms' 'python' 'bc')
+_headers=('linux-aarch64-rockchip-bsp6.1-armbian-git-headers')
 makedepends=('git' 'grep')
+mekdepends+=$_headers
+
 
 _switchcore(){
   cd ${srcdir}/$_srcname
-  #_core=$(git ls-remote -b --sort -version:refname | grep -oh core[0-9]* | head -n 1)
-  _core=core96
+  _core=$(git ls-remote -b --sort -version:refname | grep -oh core[0-9]* | head -n 1)
   git checkout release/${_core} --quiet
   git reset --hard --quiet
   printf $_core
@@ -32,12 +34,30 @@ pkgver() {
   printf $_core.r$_commits
 }
 
-package() {
-  install -Dm644 dkms.conf "${pkgdir}"/usr/src/${_pkgname}-${pkgver}/dkms.conf
+build(){
+  _core=$(_switchcore)
+  cp dkms.conf _dkms.conf
   # Set name and version
   sed -e "s/@PKGBASE@/${_pkgname}/" \
       -e "s/@PKGVER@/${pkgver}/" \
-      -i "${pkgdir}"/usr/src/${_pkgname}-${pkgver}/dkms.conf
+      -i _dkms.conf
+  ln -sf $_srcname $_pkgname-$pkgver
+}
+
+check(){
+  _core=$(_switchcore)
+  for _kernel in ${_headers[@]}; do
+    mkdir -p $srcdir/test_dkms
+    rm -rf $srcdir/test_dkms/*
+  
+    echo "Test Building for $_kernel"
+    _kernel_dir=$(pacman -Ql $_kernel | grep -o "/usr/lib/modules/.*/build" | head -1)
+    dkms build -c _dkms.conf --kernelsourcedir $_kernel_dir --dkmstree=$srcdir/test_dkms -k 6.1.118-rockchip --sourcetree=$srcdir $_pkgname/$pkgver
+  done
+}
+
+package() {
+  install -Dm644 _dkms.conf "${pkgdir}"/usr/src/${_pkgname}-${pkgver}/dkms.conf
   # Copy sources (including Makefile)
   _switchcore
   cp -r ${srcdir}/$_srcname/* "${pkgdir}"/usr/src/${_pkgname}-${pkgver}/
