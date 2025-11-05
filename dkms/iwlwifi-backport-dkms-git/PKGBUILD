@@ -14,10 +14,7 @@ source=(git+$url dkms.conf)
 sha256sums=('SKIP'
             'SKIP')
 depends=('dkms' 'python' 'bc')
-_headers=('linux-aarch64-rockchip-bsp6.1-armbian-git-headers')
-makedepends=('git' 'grep')
-mekdepends+=$_headers
-
+makedepends=('linux-aarch64-rockchip-bsp6.1-armbian-git-headers')
 
 _switchcore(){
   cd ${srcdir}/$_srcname
@@ -46,7 +43,7 @@ build(){
 
 check(){
   _core=$(_switchcore)
-  for _kernel in ${_headers[@]}; do
+  for _kernel in ${makedepends[@]}; do
     mkdir -p $srcdir/test_dkms
     rm -rf $srcdir/test_dkms/*
   
