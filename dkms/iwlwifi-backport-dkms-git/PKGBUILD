@@ -52,7 +52,8 @@ check(){
   
     echo "Test Building for $_kernel"
     _kernel_dir=$(pacman -Ql $_kernel | grep -o "/usr/lib/modules/.*/build" | head -1)
-    dkms build -c _dkms.conf --kernelsourcedir $_kernel_dir --dkmstree=$srcdir/test_dkms -k 6.1.118-rockchip --sourcetree=$srcdir $_pkgname/$pkgver
+    _kernel_ver=$(basename $(pacman -Ql $_kernel | grep -o "/usr/lib/modules/.*/" | head -1))
+    dkms build -c _dkms.conf --kernelsourcedir $_kernel_dir --dkmstree=$srcdir/test_dkms -k $_kernel_ver --sourcetree=$srcdir $_pkgname/$pkgver
   done
 }
 
