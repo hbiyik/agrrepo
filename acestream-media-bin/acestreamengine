@@ -1,18 +1,15 @@
 #!/bin/bash
 
-ROOTFS="/usr/lib/acestream"
-CACHEDIR="/var/lib/ACEStream"
-ANDROID_ROOT=/system
-ANDROID_DATA=/data
-ACEPATH=/data/org.acestream.media
-PYTHON_HOME=$ACEPATH/python/lib
-PYTHON_PATH=$ACEPATH/python/lib/stdlib.zip:$ACEPATH/python/lib/modules:$PYTHON_PATH:$ACEPATH/modules.zip
+ROOTFS=/usr/lib/acestream
+STATEDIR=/var/lib/ACEStream
 
 systemd-nspawn -D $ROOTFS \
- -E LD_LIBRARY_PATH=/data/org.acestream.media/python/lib \
- -E ANDROID_ROOT=$ANDROID_ROOT \
- -E ANDROID_DATA=$ANDROID_DATA \
- -E PYTHONHOME=$PYTHON_HOME \
- -E PYTHONPATH=$PYTHON_PATH \
- --bind $CACHEDIR:$ACEPATH/.ACEStream \
-  $ACEPATH/python/bin/python $ACEPATH/main.py $@
+ -E ACESTREAM_HOME=/acestream \
+ -E ANDROID_ROOT=/system \
+ -E ANDROID_DATA=/data \
+ -E PYTHONHOME=/acestream/python \
+ -E PYTHONPATH=/acestream/python/lib/stdlib:/acestream/python/lib/modules:/acestream/data:/acestream/modules.zip:/acestream/eggs-unpacked:/acestream/lib \
+ -E LD_LIBRARY_PATH=/system/lib64:/system/lib:/acestream/python/lib \
+ -E PATH=/acestream/python/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+ --bind $STATEDIR:/dev/shm/.ACEStream \
+  /acestream/python/bin/python /acestream/main.py $@

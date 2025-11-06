@@ -3,7 +3,7 @@ Description=AceStream Media Service
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/acestreamengine --client-console
+ExecStart=/usr/bin/acestreamengine --client-console --bind-all --disable-sentry --live-cache-type=memory --vod-cache-type=memory --mem-cache-size=104857600 --log-stdout --access-token=acestream
 
 [Install]
-WantedBy=multi-user.target 
+WantedBy=multi-user.target
