@@ -158,7 +158,8 @@ jobs:
                   kodi-addon-visualization-shadertoy-git,
                   kodi-addon-visualization-spectrum-git,
                   kodi-addon-visualization-starburst-git,
-                  kodi-addon-visualization-waveform-git,]
+                  kodi-addon-visualization-waveform-git,
+                  tvheadend-git,]
     steps:
       - uses: actions/download-artifact@v4
         with:
