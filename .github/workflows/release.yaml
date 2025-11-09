@@ -159,7 +159,8 @@ jobs:
                   kodi-addon-visualization-spectrum-git,
                   kodi-addon-visualization-starburst-git,
                   kodi-addon-visualization-waveform-git,
-                  tvheadend-git,]
+                  tvheadend-git,
+                  libdvbcsa-git,]
     steps:
       - uses: actions/download-artifact@v4
         with:
