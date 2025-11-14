@@ -7,9 +7,11 @@ pkgname=(
   "${pkgbase}-cpu"
   "python-${pkgbase}-cpu"
 )
-pkgver=1.23.1
+pkgver=1.23.2.1
+_commit=94de31fa124c29e79c9583e3273a1a60a7e8f7b0
+_srcdir=${pkgbase}-${_commit}
 _pkgdesc='Cross-platform, high performance scoring engine for ML models'
-pkgrel=9
+pkgrel=1
 arch=('x86_64' 'aarch64' 'armv7h')
 url='https://github.com/microsoft/onnxruntime'
 license=('MIT')
@@ -20,7 +22,7 @@ depends=('python-numpy' 'python-coloredlogs' 'python-psutil'
 makedepends=('git' 'cmake' 'ninja' 'pybind11' 'nlohmann-json' 'chrono-date' 'cxxopts'
              'python-setuptools' 'python-installer' 'python-wheel' 'python-build')
 
-source=("git+https://github.com/microsoft/onnxruntime#tag=v${pkgver}")
+source=("runtime-${pkgver}.tar.gz::https://github.com/microsoft/onnxruntime/archive/$_commit.tar.gz")
 sha256sums=('SKIP')
 
 build() {
@@ -40,11 +42,10 @@ build() {
     -Donnxruntime_ENABLE_TRAINING=ON
     -Donnxruntime_ENABLE_LAZY_TENSOR=OFF
     -Donnxruntime_USE_PREINSTALLED_EIGEN=OFF
-    -DCMAKE_CXX_STANDARD=17
     -Donnxruntime_USE_FULL_PROTOBUF=OFF)
 
   echo "Build onnxruntime without GPU support"
-  cd "${srcdir}/${pkgbase}"
+  cd "${srcdir}/${_srcdir}"
   cmake "${_cmake_args[@]}"
   cmake --build build
 
@@ -59,7 +60,7 @@ package_onnxruntime-cpu() {
   provides=("${pkgbase}=${pkgver}")
   conflicts=("${pkgbase}")
 
-  cd "${pkgbase}"
+  cd "${_srcdir}"
   DESTDIR="${pkgdir}" cmake --install build
 
   install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
@@ -72,7 +73,7 @@ package_python-onnxruntime-cpu() {
   provides=("python-${pkgbase}=${pkgver}")
   conflicts=("python-${pkgbase}")
 
-  cd "${pkgbase}"
+  cd "${_srcdir}"
   python -m installer --destdir="${pkgdir}" dist/*.whl
   install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
   install -Dm644 ThirdPartyNotices.txt "${pkgdir}/usr/share/licenses/${pkgname}/ThirdPartyNotices.txt"
