@@ -1,0 +1,42 @@
+_pkgname=wyoming-faster-whisper
+pkgname=python-$_pkgname
+pkgdesc="Wyoming Server for Faster Whisper"
+pkgver=2.5.0
+pkgrel=2
+arch=(any)
+url="https://github.com/rhasspy/wyoming-faster-whisper"
+license=('MIT')
+depends=(python 'python-wyoming>=1.5.2' 'python-faster-whisper>=1.0.3')
+makedepends=('python-build' 'python-installer' 'python-wheel' 'python-setuptools')
+source=("git+https://github.com/rhasspy/wyoming-faster-whisper.git"
+        wyoming-faster-whisper.conf
+        wyoming-faster-whisper.service)
+sha256sums=('SKIP' 'SKIP' 'SKIP')
+install=$_pkgname.install
+
+_switchtag(){
+  _tag_orig=$(git tag -l --sort=creatordate | tail -1)
+  _tag=$(echo $_tag_orig | grep -o "[0-9.]*" | tr -d "\n")
+  git checkout $_tag_orig --quiet
+  git reset --hard --quiet
+  printf $_tag
+}
+
+pkgver() {
+  cd $_pkgname
+  printf $(_switchtag)
+}
+
+build() {
+  cd $_pkgname
+  _tag=$(_switchtag)
+  python -m build --wheel --no-isolation
+}
+
+package() {
+  cd $_pkgname
+  python -m installer --destdir="$pkgdir" dist/*.whl
+
+  install -Dm644 ../wyoming-faster-whisper.service -t "$pkgdir/usr/lib/systemd/system"
+  install -Dm644 ../wyoming-faster-whisper.conf "$pkgdir/etc/conf.d/wyoming-faster-whisper"
+}

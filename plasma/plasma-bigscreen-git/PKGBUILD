@@ -1,0 +1,19 @@
+eval "$(curl -s -L https://raw.githubusercontent.com/hbiyik/agrrepo/refs/heads/master/libinherit/remote.sh)"
+inherit https://raw.githubusercontent.com/archlinux/aur/refs/heads/plasma-bigscreen-git
+source+=("plasmaver.patch")
+md5sums+=('SKIP')
+pkgver=r1
+
+depends=('kdeconnect' 
+         'plasma-nm' 
+         'plasma-pa' 
+         'plasma-nano'
+         'bluez-qt'
+         'qt6-webengine'
+         )
+
+makedepends=('cmake' 'extra-cmake-modules' 'git') 
+
+prepare() {
+    patch -N -p0 -i plasmaver.patch
+}

@@ -1,0 +1,50 @@
+# Maintainer: boogiepop <boogiepop@gmx.com>
+_base_kernel=linux-aarch64-rockchip-bsp6.1-boogie
+_kernel_max=6.1.116
+_kernel_ver=6.1.115
+_kernel_min=6.1.114
+_kernel_tag=$_kernel_ver-rockchip
+
+_drvname=openvfd
+_srcname=linux_openvfd/driver
+_url="https://github.com/hbiyik/linux_openvfd.git"
+_bin=OpenVFDService
+
+pkgname=$_base_kernel-$_drvname-git
+pkgver=r146
+pkgrel=1
+pkgdesc="Out of tree module of $_drvname for kernel $_base_kernel $_base_kernel"
+arch=('aarch64')
+url=$_url
+license=('GPL')
+source=("git+$_url")
+sha256sums=('SKIP')
+depends=("$_base_kernel-git>$_kernel_min"
+         "$_base_kernel-git<$_kernel_max"
+         "$_base_kernel-headers-git>$_kernel_min"
+         "$_base_kernel-headers-git<$_kernel_max"
+         )
+makedepends=('git' 'findutils')
+
+pkgver() {
+  cd $_srcname
+  printf $_kernel_ver.r$(git rev-list --count HEAD)
+}
+
+build() {
+  cd $_srcname
+  make -C /lib/modules/$_kernel_tag/build M=$(pwd) \
+  				modules
+  cd ../
+  gcc -Wall -w -o $_bin $_bin.c -lm -lpthread -include "string.h" -include "unistd.h" -include "sys/stat.h"
+}
+
+package() {
+  cd $_srcname
+  for _ko in $(find . -type f -name \*.ko); do
+  	install -Dm644 $_ko -t "$pkgdir/usr/lib/modules/$_kernel_tag/updates"
+  done
+  cd ../
+  install -Dm755 $_bin -t "$pkgdir/usr/bin"
+}
+

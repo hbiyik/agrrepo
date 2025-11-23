@@ -1,0 +1,8 @@
+post_install() {
+  systemctl daemon-reload
+  systemctl try-restart wyoming-faster-whisper
+}
+
+post_upgrade() {
+  post_install
+}

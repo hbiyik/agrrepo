@@ -1,0 +1,82 @@
+# Maintainer: Torsten Keßler <tpkessler@archlinux.org>
+# Contributor: Gustavo Alvarez <sl1pkn07@gmail.com>
+# Contributor: Chih-Hsuan Yen <yan12125@gmail.com>
+
+pkgbase=onnxruntime
+pkgname=(
+  "${pkgbase}-cpu"
+  "python-${pkgbase}-cpu"
+)
+pkgver=1.23.2.1
+_commit=94de31fa124c29e79c9583e3273a1a60a7e8f7b0
+_srcdir=${pkgbase}-${_commit}
+_pkgdesc='Cross-platform, high performance scoring engine for ML models'
+pkgrel=1
+arch=('x86_64' 'aarch64' 'armv7h')
+url='https://github.com/microsoft/onnxruntime'
+license=('MIT')
+depends=('abseil-cpp' 'boost' 'nsync')
+depends=('python-numpy' 'python-coloredlogs' 'python-psutil'
+         'python-py-cpuinfo' 'python-sympy' 'python-scipy' 'python-pillow'
+         'python-flatbuffers' 'python-protobuf' 'python-packaging')
+makedepends=('git' 'cmake' 'ninja' 'pybind11' 'nlohmann-json' 'chrono-date' 'cxxopts'
+             'python-setuptools' 'python-installer' 'python-wheel' 'python-build')
+
+source=("runtime-${pkgver}.tar.gz::https://github.com/microsoft/onnxruntime/archive/$_commit.tar.gz")
+sha256sums=('SKIP')
+
+build() {
+  local _cmake_args=(
+    --compile-no-warning-as-error
+    -S cmake
+    -B build
+    -Wno-dev
+    -G Ninja
+    -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+    -DCMAKE_BUILD_TYPE=None
+    -DCMAKE_INSTALL_PREFIX=/usr
+    -Donnxruntime_ENABLE_PYTHON=ON
+    -Donnxruntime_BUILD_SHARED_LIB=ON
+    -Donnxruntime_BUILD_UNIT_TESTS=OFF
+    -DBUILD_TESTING=OFF
+    -Donnxruntime_ENABLE_TRAINING=ON
+    -Donnxruntime_ENABLE_LAZY_TENSOR=OFF
+    -Donnxruntime_USE_PREINSTALLED_EIGEN=OFF
+    -Donnxruntime_USE_FULL_PROTOBUF=OFF)
+
+  echo "Build onnxruntime without GPU support"
+  cd "${srcdir}/${_srcdir}"
+  cmake "${_cmake_args[@]}"
+  cmake --build build
+
+  mkdir onnxruntime/capi
+  python setup.py --help # We have to call it like this once to generate the file we need.
+  cp -r build/onnxruntime/* onnxruntime
+  python -m build --wheel --no-isolation
+}
+
+package_onnxruntime-cpu() {
+  pkgdesc="$_pkgdesc (CPU only)"
+  provides=("${pkgbase}=${pkgver}")
+  conflicts=("${pkgbase}")
+
+  cd "${_srcdir}"
+  DESTDIR="${pkgdir}" cmake --install build
+
+  install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+  install -Dm644 ThirdPartyNotices.txt "${pkgdir}/usr/share/licenses/${pkgname}/ThirdPartyNotices.txt"
+}
+
+package_python-onnxruntime-cpu() {
+  pkgdesc="$_pkgdesc (CPU only)"
+  depends+=("${pkgbase}-cpu" "${_pydepends[@]}")
+  provides=("python-${pkgbase}=${pkgver}")
+  conflicts=("python-${pkgbase}")
+
+  cd "${_srcdir}"
+  python -m installer --destdir="${pkgdir}" dist/*.whl
+  install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+  install -Dm644 ThirdPartyNotices.txt "${pkgdir}/usr/share/licenses/${pkgname}/ThirdPartyNotices.txt"
+}
+
+

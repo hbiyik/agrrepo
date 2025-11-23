@@ -1,0 +1,43 @@
+_pkgname=integration
+pkgname=home-assistant-hacs
+provides=(python-$pkgname)
+conflicts=(python-$pkgname)
+pkgver=2.0.5
+pkgrel=1
+pkgdesc='Manage and discover custom elements for Home Assistant directly from the UI'
+arch=('any')
+url='https://hacs.xyz'
+license=('MIT')
+depends=('home-assistant')
+makedepends=('python-pip')
+install=$pkgname.install
+noextract=("$pkgname-$pkgver.zip")
+source=("git+https://github.com/hacs/integration.git")
+sha512sums=('SKIP')
+
+
+_switchtag(){
+  _tag=$(git tag -l --sort=creatordate | tail -1)
+  git checkout $_tag --quiet
+  git reset --hard --quiet
+  printf $_tag
+}
+
+pkgver() {
+  cd $_pkgname
+  _tag=$(_switchtag)
+  printf $(echo $_tag | grep -o "[0-9.]*" | tr -d "\n")
+}
+
+build(){
+  cd $_pkgname
+  _tag=$(_switchtag)
+  ./scripts/install/frontend
+  python ./scripts/update/manifest.py --version $_tag 
+}
+
+package() {
+  cd $_pkgname
+  mkdir -p "$pkgdir/var/lib/hass"
+  cp -rf custom_components "$pkgdir/var/lib/hass/"
+}

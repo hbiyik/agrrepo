@@ -1,0 +1,69 @@
+_pkgname=home-assistant
+pkgname=$_pkgname-core
+pkgdesc='Open source home automation that puts local control and privacy first'
+pkgver=2025.11.0b1
+pkgrel=1
+epoch=1
+arch=('any')
+url='https://home-assistant.io/'
+license=('Apache-2.0')
+provides=($_pkgname)
+conflicts=($_pkgname)
+depends=(
+  'bluez-libs'
+  'ffmpeg'
+  'gcc'
+  'lapack'
+  'libffi'
+  'libjpeg-turbo'
+  'libtiff'
+  'openjpeg2'
+  'openssl'
+  'python'
+  'tzdata'
+  'zlib'
+)
+makedepends=(
+  'git'
+  'python-build'
+  'python-setuptools'
+  'python-wheel'
+)
+install=$_pkgname.install
+source=(
+  "$_pkgname::git+https://github.com/home-assistant/core.git"
+  'home-assistant.service'
+  'home-assistant.sysusers'
+  'home-assistant.tmpfiles'
+)
+sha512sums=('SKIP' 'SKIP' 'SKIP' 'SKIP')
+
+
+_switchtag(){
+  _tag_orig=$(git tag -l --sort=creatordate | tail -1)
+  _tag=$(echo $_tag_orig | grep -o "[0-9.a-z]*" | tr -d "\n")
+  git checkout $_tag_orig --quiet
+  git reset --hard --quiet
+  printf $_tag
+}
+
+pkgver() {
+  cd $_pkgname
+  printf $(_switchtag)
+}
+
+build() {
+  cd $_pkgname
+  _tag=$(_switchtag)
+  python -m script.translations develop --all
+  python -m build -x --wheel --no-isolation
+}
+
+package() {
+  _whl=$(basename $(ls home-assistant/dist/*.whl))
+  sed "s/@WHEEL@/$_whl/" -i home-assistant.service
+  install -Dm 644 home-assistant/dist/$_whl -t "${pkgdir}"/var/lib/hass/
+  install -Dm 644 home-assistant.service -t "${pkgdir}"/usr/lib/systemd/system/
+  install -Dm 644 home-assistant.sysusers "${pkgdir}"/usr/lib/sysusers.d/home-assistant.conf
+  install -Dm 644 home-assistant.tmpfiles "${pkgdir}"/usr/lib/tmpfiles.d/home-assistant.conf
+}

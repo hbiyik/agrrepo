@@ -1,0 +1,42 @@
+# Maintainer: boogiepop <boogiepop@gmx.com>
+
+pkgname=acestream-engine-arm-bin
+pkgver=3.1.73
+pkgrel=3
+pkgdesc="ACE Stream engine for arm based cpus"
+arch=("aarch64" "armv7h")
+url="http://acestream.org"
+license=("unknown")
+depends=("systemd")
+provides=("acestream-engine")
+conflicts=("acestream-engine")
+options=(!strip)
+source=(
+  git+https://github.com/hbiyik/cheapstream.git
+  "acestream-engine.service"
+)
+sha256sums=(
+  "SKIP"
+  "SKIP"
+)
+
+build() {
+	cd "$srcdir/cheapstream"
+	rm -rf dist
+	./build.sh arm
+}
+
+package() {
+  # create dirs
+  install -d "${pkgdir}/usr/bin"
+  install -d "${pkgdir}/opt"
+  
+  # copy files
+  cp -rf $srcdir/cheapstream/dist $pkgdir/opt/acestream
+  
+  # create symlinks
+  ln -s "/opt/acestream/acestreamengine" "$pkgdir/usr/bin/acestreamengine"
+  
+  # install service
+  install -Dm644 "$srcdir/acestream-engine.service" "$pkgdir/usr/lib/systemd/system/acestream-engine.service"
+  }

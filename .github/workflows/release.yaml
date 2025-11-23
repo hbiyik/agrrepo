@@ -1,0 +1,220 @@
+name: release
+on: 
+  workflow_dispatch:
+  schedule:
+    - cron:  '0 */4 * * *'
+
+jobs:
+  getassets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: robinraju/release-downloader@v1
+        with:
+          tag: 'alarm-aarch64'
+          fileName: '*'
+          out-file-path: 'oldassets'
+      - run: ls -la ${{ github.workspace }}/oldassets
+      - name: zip artifacts
+        if: always()
+        run: |
+          zip -j0 oldassets.zip oldassets/*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: old-assets
+          path: oldassets.zip
+
+  build:
+    needs: getassets
+    runs-on: ubuntu-24.04-arm
+    continue-on-error: true
+    strategy:
+      matrix:
+        package: [gitweb-dlagent,
+                  linux-aarch64-rk3588-collabora-git linux-aarch64-rk3588-collabora-git-headers,
+                  linux-aarch64-rockchip-bsp5.10-radxa-git linux-aarch64-rockchip-bsp5.10-radxa-git-headers,
+                  linux-aarch64-rockchip-bsp6.1-armbian-git linux-aarch64-rockchip-bsp6.1-armbian-git-headers,
+                  linux-aarch64-rockchip-bsp6.1-joshua-git linux-aarch64-rockchip-bsp6.1-joshua-git-headers,
+                  linux-aarch64-rockchip-bsp6.1-boogie-git linux-aarch64-rockchip-bsp6.1-boogie-headers-git linux-aarch64-rockchip-bsp6.1-boogie-dtb-git linux-aarch64-rockchip-bsp6.1-boogie-openvfd-git,
+                  librga-multi,
+                  acestream-media-bin,
+                  8852be-dkms-git,
+                  8852bu-dkms-git,
+                  iwlwifi-backport-dkms-git,
+                  r8125-dkms-git,
+                  dri2to3-git,
+                  bcm4335-firmware,
+                  gl4es-git,
+                  kodi-mpp-git,
+                  libmali-valhall-g610-base libmali-valhall-g610-dummy libmali-valhall-g610-gbm libmali-valhall-g610-x11-gbm libmali-valhall-g610-wayland-gbm libmali-valhall-g610-x11-wayland-gbm,
+                  mesa-panvk-git,
+                  mesa-panfork-git,
+                  mpp-git,
+                  ffmpeg-mpp,
+                  firefox-mpp,
+                  libv4l-rkmpp-git,
+                  v4l-utils-mpp,
+                  sunshine-mpp-git,
+                  dolphin-emu dolphin-emu-tool,
+                  agr-git,
+                  mpv-mpp,
+                  plasma-nano plasma-bigscreen-git,
+                  ctranslate2 python-ctranslate2,
+                  espeak-ng-git,
+                  onednn,
+                  onnxruntime-cpu python-onnxruntime-cpu,
+                  python-piper-tts-git,
+                  python-av,
+                  python-faster-whisper,
+                  python-sentence-stream-git,
+                  python-tokenizers,
+                  python-wyoming,
+                  python-wyoming-faster-whisper,
+                  python-wyoming-piper,
+                  home-assistant-core,
+                  home-assistant-hacs,
+                  python-home-assistant-frontend,
+                  kodi-addon-audiodecoder-2sf-git,
+                  kodi-addon-audiodecoder-asap-git,
+                  kodi-addon-audiodecoder-gme-git,
+                  kodi-addon-audiodecoder-gsf-git,
+                  kodi-addon-audiodecoder-hvl-git,
+                  kodi-addon-audiodecoder-modplug-git,
+                  kodi-addon-audiodecoder-ncsf-git,
+                  kodi-addon-audiodecoder-nosefart-git,
+                  kodi-addon-audiodecoder-openmpt-git,
+                  kodi-addon-audiodecoder-organya-git,
+                  kodi-addon-audiodecoder-qsf-git,
+                  kodi-addon-audiodecoder-sacd-git,
+                  kodi-addon-audiodecoder-sidplay-git,
+                  kodi-addon-audiodecoder-snesapu-git,
+                  kodi-addon-audiodecoder-ssf-git,
+                  kodi-addon-audiodecoder-stsound-git,
+                  kodi-addon-audiodecoder-timidity-git,
+                  kodi-addon-audiodecoder-upse-git,
+                  kodi-addon-audiodecoder-usf-git,
+                  kodi-addon-audiodecoder-vgmstream-git,
+                  kodi-addon-audiodecoder-wsr-git,
+                  kodi-addon-audioencoder-flac-git,
+                  kodi-addon-audioencoder-lame-git,
+                  kodi-addon-audioencoder-vorbis-git,
+                  kodi-addon-audioencoder-wav-git,
+                  kodi-addon-game-libretro-2048-git,
+                  kodi-addon-game-libretro-git,
+                  kodi-addon-imagedecoder-heif-git,
+                  kodi-addon-imagedecoder-mpo-git,
+                  kodi-addon-imagedecoder-raw-git,
+                  kodi-addon-inputstream-adaptive-git,
+                  kodi-addon-inputstream-ffmpegdirect-git,
+                  kodi-addon-inputstream-rtmp-git,
+                  kodi-addon-peripheral-joystick-git,
+                  kodi-addon-peripheral-xarcade-git,
+                  kodi-addon-pvr-argustv-git,
+                  kodi-addon-pvr-dvblink-git,
+                  kodi-addon-pvr-dvbviewer-git,
+                  kodi-addon-pvr-filmon-git,
+                  kodi-addon-pvr-freebox-git,
+                  kodi-addon-pvr-hdhomerun-git,
+                  kodi-addon-pvr-hts-git,
+                  kodi-addon-pvr-iptvsimple-git,
+                  kodi-addon-pvr-mediaportal-tvserver-git,
+                  kodi-addon-pvr-mythtv-git,
+                  kodi-addon-pvr-nextpvr-git,
+                  kodi-addon-pvr-njoy-git,
+                  kodi-addon-pvr-octonet-git,
+                  kodi-addon-pvr-pctv-git,
+                  kodi-addon-pvr-plutotv-git,
+                  kodi-addon-pvr-sledovanitv-cz-git,
+                  kodi-addon-pvr-stalker-git,
+                  kodi-addon-pvr-teleboy-git,
+                  kodi-addon-pvr-vbox-git,
+                  kodi-addon-pvr-vdr-vnsi-git,
+                  kodi-addon-pvr-vuplus-git,
+                  kodi-addon-pvr-waipu-git,
+                  kodi-addon-pvr-wmc-git,
+                  kodi-addon-pvr-zattoo-git,
+                  kodi-addon-screensaver-asteroids-git,
+                  kodi-addon-screensaver-asterwave-git,
+                  kodi-addon-screensaver-biogenesis-git,
+                  kodi-addon-screensaver-cpblobs-git,
+                  kodi-addon-screensaver-greynetic-git,
+                  kodi-addon-screensaver-matrixtrails-git,
+                  kodi-addon-screensaver-pingpong-git,
+                  kodi-addon-screensaver-pyro-git,
+                  kodi-addon-screensaver-shadertoy-git,
+                  kodi-addon-screensaver-stars-git,
+                  kodi-addon-screensavers-rsxs-git,
+                  kodi-addon-vfs-libarchive-git,
+                  kodi-addon-vfs-rar-git,
+                  kodi-addon-vfs-sftp-git,
+                  kodi-addon-vfs-smb2-git,
+                  kodi-addon-visualization-fishbmc-git,
+                  kodi-addon-visualization-goom-git,
+                  kodi-addon-visualization-matrix-git,
+                  kodi-addon-visualization-milkdrop-git,
+                  kodi-addon-visualization-milkdrop2-git,
+                  kodi-addon-visualization-pictureit-git,
+                  kodi-addon-visualization-projectm-git,
+                  kodi-addon-visualization-shadertoy-git,
+                  kodi-addon-visualization-spectrum-git,
+                  kodi-addon-visualization-starburst-git,
+                  kodi-addon-visualization-waveform-git,
+                  tvheadend-git,
+                  libdvbcsa-git,]
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: old-assets
+      - name: prepare old packages
+        run: |
+          mkdir -p agr/tarballs/native/repo
+          mkdir -p upload
+          unzip -d agr/tarballs/native/repo oldassets.zip
+          packages='${{ matrix.package }}'
+          for package in ${packages}; do
+            cp -rf agr/tarballs/native/repo/$package-*.pkg.* upload/ || true
+          done
+          ls -la agr/tarballs/native/repo
+          ls -la upload
+      - name: Build ${{ matrix.package }}
+        uses: hbiyik/agr@master
+        with:
+          package: ${{ matrix.package }}
+          skippgpcheck: true
+          ignorearch: true
+      - name: prepare built packages to upload
+        if: always()
+        run: |
+          packages='${{ matrix.package }}'
+          for package in ${packages}; do
+            cp -rf agr/tarballs/native/repo/$package-*.pkg.* upload/ || true
+          done
+          zip -j0 "${{ matrix.package }}.zip" upload/*
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: build-${{ matrix.package }}
+          path: ${{ matrix.package }}.zip
+
+  genrepo:
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: build-*
+          path: zips
+          merge-multiple: true
+      - run: |
+          mkdir -p repo
+          ls -la zips
+          unzip -o -d repo "zips/*"
+          ls -la repo
+      - uses: actions/checkout@v4
+        with:
+          path: agrrepo
+      - uses: ./agrrepo/.github/actions/sync
+        with:
+          tag: alarm-aarch64
+          reponame: boogie

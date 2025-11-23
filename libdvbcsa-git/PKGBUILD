@@ -1,0 +1,5 @@
+eval "$(curl -s -L https://raw.githubusercontent.com/hbiyik/agrrepo/refs/heads/master/libinherit/remote.sh)"
+inherit https://raw.githubusercontent.com/archlinux/aur/refs/heads/libdvbcsa-git
+pkgver=r23.gbc6c0b1
+
+arch+=("aarch64" "armv7h")

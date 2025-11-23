@@ -1,0 +1,6 @@
+_addonname="game.libretro.2048"
+_addongiturl="github.com/kodi-game"
+_addongitbranch="master"
+
+eval "$(curl -s -L https://raw.githubusercontent.com/hbiyik/agrrepo/refs/heads/master/libinherit/remote.sh)"
+inherit https://raw.githubusercontent.com/hbiyik/agrrepo/refs/heads/master/kodi/kodi-binary-addons/base/

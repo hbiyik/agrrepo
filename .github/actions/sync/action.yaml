@@ -1,0 +1,38 @@
+name: 'sync assets from repo to release'
+inputs:
+  tag:
+    description: tag name to sync assets
+    required: true
+  reponame:
+    description: archlinux repository name
+    required: true
+  pkgext:
+    description: database file extention
+    default: tar.xz
+  repopath:
+    description: relative path to workspace, which is holding package files
+    default: repo
+  repository:
+    description: owner/reponame of the github account of where the tag lies
+    default: ${{ github.repository }}
+  token:
+    description: access token
+    default: ${{ github.token }}
+runs:
+  using: 'composite'
+  steps:
+    - name: install dependencies
+      run: sudo apt update && sudo apt install -y pacman-package-manager libarchive-tools
+      shell: bash
+    - name: Pass Inputs to Shell
+      run: |
+          echo "TAG=${{ inputs.tag }}" >> $GITHUB_ENV
+          echo "REPONAME=${{ inputs.reponame }}" >> $GITHUB_ENV
+          echo "PKGEXT=${{ inputs.pkgext }}" >> $GITHUB_ENV
+          echo "REPOPATH=${{ inputs.repopath }}" >> $GITHUB_ENV
+          echo "REPOSITORY=${{ inputs.repository }}" >> $GITHUB_ENV
+          echo "TOKEN=${{ inputs.token }}" >> $GITHUB_ENV
+      shell: bash
+    - name: Run sync
+      run: python agrrepo/.github/actions/sync/action.py
+      shell: bash

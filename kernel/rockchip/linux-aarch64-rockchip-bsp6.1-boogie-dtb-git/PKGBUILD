@@ -1,0 +1,53 @@
+# AArch64
+# Maintainer: Boogie
+
+_pkgbase=linux-aarch64-rockchip-bsp6.1-boogie
+_url="github.com/hbiyik"
+_branch_prefix="linux-6.1-develop"
+_branch="$_branch_prefix-dts"
+_desc="boogies personal rockchip kernel device trees"
+_srcname='linux'
+_url_git="gitweb-dlagent://${_url}/${_srcname}.git"
+
+pkgname="${_pkgbase}-dtb-git"
+pkgver=6.1.99.r1277063.e067b5c19f45
+pkgrel=1
+arch=('aarch64')
+license=('GPL2')
+url="https://$_url"
+makedepends=('cpio' 'xmlto' 'docbook-xsl' 'kmod' 'inetutils' 'bc' 'git' 'gitweb-dlagent')
+options=('!strip')
+DLAGENTS+=('gitweb-dlagent::/usr/bin/gitweb-dlagent sync %u')
+source=(
+  "$_url_git#branch=$_branch"
+)
+
+sha512sums=(
+  'SKIP'
+)
+
+pkgver() {
+  cd "${_srcname}"
+
+  printf "%s.%s%s%s.r%s.%s" \
+    "$(grep '^VERSION = ' Makefile|awk -F' = ' '{print $2}')" \
+    "$(grep '^PATCHLEVEL = ' Makefile|awk -F' = ' '{print $2}')" \
+    "$(grep '^SUBLEVEL = ' Makefile|awk -F' = ' '{print $2}'|grep -vE '^0$'|sed 's/.*/.\0/')" \
+    "$(grep '^EXTRAVERSION = ' Makefile|awk -F' = ' '{print $2}'|tr -d -|sed -E 's/rockchip[0-9]+//')" \
+    "$(gitweb-dlagent version ${_url_git}#branch=$_branch --pattern \{revision\})" \
+    "$(gitweb-dlagent version ${_url_git}#branch=$_branch --pattern \{commit:.12s\})"
+}
+
+build() {
+  cd "${_srcname}"
+  make rockchip_linux_defconfig
+  unset LDFLAGS
+  make dtbs
+}
+
+package() {
+  pkgdesc="The ${_srcname} kernel, ${_desc}"
+
+  cd "${_srcname}"
+  make INSTALL_DTBS_PATH="${pkgdir}/boot/dtbs/${pkgname}" dtbs_install
+}

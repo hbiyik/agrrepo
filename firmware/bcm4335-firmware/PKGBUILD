@@ -1,0 +1,15 @@
+# Maintainer: Mahmut Dikcizgi <boogiepop a~t gmx com>
+
+pkgname=bcm4335-firmware
+pkgver=0.1
+pkgrel=1
+pkgdesc='bcm4335 firmware'
+arch=('any')
+url='https://github.com/hbiyik/agrrepo/firmware/bcm4335-firmware'
+source=('brcmfmac4335-sdio.txt')
+sha256sums=('SKIP')
+
+
+package() {
+  install -D --mode=644 brcmfmac4335-sdio.txt "${pkgdir}/usr/lib/firmware/brcm/brcmfmac4335-sdio.txt"
+}

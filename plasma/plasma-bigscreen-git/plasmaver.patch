@@ -1,0 +1,11 @@
+--- plasma-bigscreen/CMakeLists.txt	2025-08-08 21:50:06.942462652 +0200
++++ plasma-bigscreen/CMakeLists.txt.new	2025-08-08 21:52:12.836021584 +0200
+@@ -6,7 +6,7 @@
+ cmake_minimum_required(VERSION 3.24)
+ 
+ project(plasma-bigscreen)
+-set(PROJECT_VERSION "6.4.80")
++set(PROJECT_VERSION "6.4.4")
+ 
+ set(QT_MIN_VERSION "6.8.0")
+ set(KF_MIN_VERSION "6.14.0")

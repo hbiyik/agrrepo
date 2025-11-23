@@ -1,0 +1,47 @@
+_pkgname=wyoming-piper
+pkgname=python-${_pkgname}
+pkgdesc="Wyoming Server for Piper"
+pkgver=1.6.3
+pkgrel=1
+arch=(any)
+url="https://github.com/rhasspy/wyoming-piper"
+license=('MIT')
+depends=(python python-sentence-stream python-wyoming python-regex piper-tts)
+provides=(python-$_pkgname)
+conflicts=(python-$_pkgname)
+makedepends=('git' 'python-build' 'python-installer' 'python-wheel' 'python-setuptools')
+backup=(etc/conf.d/wyoming-piper)
+source=("git+https://github.com/rhasspy/wyoming-piper.git"
+        wyoming-piper.conf
+        wyoming-piper.service)
+sha512sums=('SKIP' 'SKIP' 'SKIP')
+install=$_pkgname.install
+
+_switchtag(){
+  _tag_orig=$(git tag -l --sort=creatordate | tail -1)
+  _tag=$(echo $_tag_orig | grep -o "[0-9.]*" | tr -d "\n")
+  git checkout $_tag_orig --quiet
+  git reset --hard --quiet
+  printf $_tag
+}
+
+pkgver() {
+  cd $_pkgname
+  printf $(_switchtag)
+}
+
+build() {
+  cd $_pkgname
+  _tag=$(_switchtag)
+  python -m build --wheel --no-isolation
+}
+
+package() {
+  cd $_pkgname
+  python -m installer --destdir="$pkgdir" dist/*.whl
+
+  install -Dm644 ../wyoming-piper.service -t "$pkgdir/usr/lib/systemd/system"
+  install -Dm644 ../wyoming-piper.conf "$pkgdir/etc/conf.d/wyoming-piper"
+
+  install -Dm644 LICENSE.md "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

@@ -1,0 +1,3 @@
+eval "$(curl -s -L https://raw.githubusercontent.com/hbiyik/agrrepo/refs/heads/master/libinherit/remote.sh)"
+inherit https://raw.githubusercontent.com/archlinux/aur/refs/heads/python-faster-whisper
+

@@ -1,0 +1,38 @@
+_pkgname=frontend
+pkgname=python-home-assistant-$_pkgname
+pkgver=20251001.4
+pkgrel=1
+pkgdesc="The Home Assistant frontend"
+arch=(any)
+url="https://github.com/home-assistant/frontend"
+license=(Apache-2.0)
+depends=("home-assistant")
+makedepends=("python" "python-pip")
+source=("git+https://github.com/home-assistant/frontend.git")
+sha512sums=('SKIP')
+provides=(home-assistant-$_pkgname)
+conflicts=(home-assistant-$_pkgname)
+
+_switchtag(){
+  _tag=$(git tag -l --sort=creatordate | tail -1)
+  git checkout $_tag --quiet
+  git reset --hard --quiet
+  printf $_tag
+}
+
+pkgver() {
+  cd $_pkgname
+  _tag=$(_switchtag)
+  printf $(echo $_tag | grep -o "[0-9.]*" | tr -d "\n")
+}
+
+build() {
+  cd $_pkgname
+  _tag=$(_switchtag)
+  python -m pip wheel home-assistant-frontend==$_tag
+}
+
+package() {
+  cd $_pkgname
+  python -m installer --destdir="$pkgdir" *.whl
+}

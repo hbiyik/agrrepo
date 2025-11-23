@@ -1,0 +1,41 @@
+_pkgname=wyoming
+pkgname=python-$_pkgname
+pkgdesc="Peer-to-peer protocol for voice assistants"
+pkgver=1.8.0
+pkgrel=1
+arch=(any)
+url="https://github.com/rhasspy/wyoming"
+license=('MIT')
+depends=(python)
+makedepends=('git' 'python-build' 'python-installer' 'python-wheel' 'python-setuptools')
+checkdepends=('python-pytest' 'python-pytest-asyncio')
+optdepends=('python-zeroconf: Zeroconf support')
+source=("git+https://github.com/rhasspy/wyoming.git")
+b2sums=('SKIP')
+
+
+_switchtag(){
+  _tag_orig=$(git tag -l --sort=creatordate | tail -1)
+  _tag=$(echo $_tag_orig | grep -o "[0-9.]*" | tr -d "\n")
+  git checkout $_tag_orig --quiet
+  git reset --hard --quiet
+  printf $_tag
+}
+
+pkgver() {
+  cd $_pkgname
+  printf $(_switchtag)
+}
+
+build() {
+  cd $_pkgname
+  _tag=$(_switchtag)
+  python -m build --wheel --no-isolation
+}
+
+package() {
+  cd $_pkgname
+  python -m installer --destdir="$pkgdir" dist/*.whl
+
+  install -Dm644 LICENSE.md "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

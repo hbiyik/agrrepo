@@ -1,0 +1,47 @@
+# Maintainer: Mahmut Dikcizgi <boogiepop a~t gmx com>
+#	https://download.acestream.media/android/media.web/stable/AceStreamMedia-3.1.80.0-armv8_64.apk
+_srcname=docker-acestream-arm
+_bin=acestreamengine
+_pkgname=acestream-media
+pkgname=$_pkgname-bin
+pkgver=3.2.14
+pkgrel=2
+pkgdesc='Acestream Media Service'
+arch=('aarch64' 'armv7h')
+url='https://acestream.org'
+depends=(systemd)
+provides=("acestream-engine")
+conflicts=("acestream-engine")
+makedepends=('unzip')
+options=(!strip !debug)
+source=("https://github.com/jopsis/$_srcname/archive/refs/tags/v$pkgver.tar.gz"
+        $_bin
+        service)
+sha256sums=('02b741fc818b40ef41faa89e4d0d3702eac072751071b6211d8a5a5e775aa860'
+            '2ffbc92ff1da3f16f6b88bbf4a0642ad3a5c54d88a890c3d9fb09d79d8cdbdc5'
+            '33cb80d4cb3cffb7728aa1563788b099ed51025af05615b9976875107ecf8bcd')
+install=$_pkgname.install
+
+package() {
+  _arch="arm64"
+  if [[ $CARCH == "armv7h" ]]; then
+    _arch="arm32"
+  fi
+
+  _prefix="/usr/lib/acestream"
+  _statedir="/var/lib/ACEStream"
+  install -d ${pkgdir}${_statedir}
+  install -d ${pkgdir}${_prefix}/usr
+  install -d ${pkgdir}${_prefix}/sys
+  install -d ${pkgdir}${_prefix}/dev
+  install -d ${pkgdir}${_prefix}/proc
+  install -d ${pkgdir}${_prefix}/run
+
+  unzip -o "${srcdir}/$_srcname-$pkgver/$_arch/system.zip" -d ${pkgdir}${_prefix}
+  unzip -o "${srcdir}/$_srcname-$pkgver/$_arch/acestream*.zip" -d ${pkgdir}${_prefix}
+  cp -f ${srcdir}/$_srcname-$pkgver/$_arch/main.py ${pkgdir}${_prefix}/acestream/
+  cp -f ${srcdir}/$_srcname-$pkgver/$_arch/dnsproxyd.py ${pkgdir}${_prefix}/acestream/
+  
+  install -Dm755 ${srcdir}/$_bin ${pkgdir}/usr/bin/$_bin
+  install -Dm644 "service" "$pkgdir/usr/lib/systemd/system/$_pkgname.service"
+}

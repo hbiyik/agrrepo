@@ -1,0 +1,20 @@
+post_install() {
+    getent group icecream &>/dev/null || groupadd -r icecream >/dev/null
+    getent passwd icecream &>/dev/null || useradd -r -g icecream -s /bin/false \
+	    -c "Icecream Daemon" -d /var/cache/icecream icecream 2>/dev/null
+    mkdir -p /var/cache/icecream
+    mkdir -p /var/log/icecream
+    touch /var/log/icecream/scheduler
+    touch /var/log/icecream/iceccd
+    chown -R icecream:icecream /var/cache/icecream /var/log/icecream/scheduler /var/log/icecream/iceccd
+}
+
+post_upgrade() {
+    post_install
+}
+
+post_remove() {
+    getent passwd icecream &>/dev/null && userdel icecream >/dev/null
+    getent group icecream &>/dev/null && groupdel icecream >/dev/null
+    true
+}

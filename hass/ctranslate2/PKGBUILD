@@ -1,0 +1,43 @@
+eval "$(curl -s -L https://raw.githubusercontent.com/hbiyik/agrrepo/refs/heads/master/libinherit/remote.sh)"
+inherit https://raw.githubusercontent.com/archlinux/aur/refs/heads/ctranslate2
+
+arch+=("aarch64" "armv7h")
+# remove cuda
+unset 'makedepends[1]'
+# remove gcc14
+unset 'makedepends[2]'
+
+build(){
+  cmake -B build -S CTranslate2 \
+    -DCMAKE_BUILD_TYPE='RelWithDebInfo' \
+    -DCMAKE_INSTALL_PREFIX='/usr' \
+    -DOPENMP_RUNTIME='COMP' \
+    -DWITH_MKL='OFF' \
+    -DWITH_DNNL='OFF' \
+    -DWITH_OPENBLAS='ON' \
+    -DOPENBLAS_INCLUDE_DIR='/usr/include/openblas' \
+    -DWITH_RUY='ON' \
+    -DCMAKE_POLICY_VERSION_MINIMUM='3.5' \
+    -DENABLE_CPU_DISPATCH='OFF' \
+    -Wno-dev
+  cmake --build build
+
+  pushd CTranslate2/python
+  CTRANSLATE2_ROOT=.. LIBRARY_PATH="$srcdir/build" python -m build --wheel --no-isolation
+  popd
+}
+
+package_python-ctranslate2() {
+  pkgdesc="A Python library for efficient inference with Transformer models."
+  depends=(
+    'ctranslate2'
+    'python-numpy'
+    'python-setuptools'
+    'python-yaml'
+  )
+
+  cd CTranslate2/python
+  python -m installer --destdir="$pkgdir" dist/*.whl
+
+  install -Dm644 ../LICENSE -t "$pkgdir/usr/share/licenses/$pkgname/"
+}
