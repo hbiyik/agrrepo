@@ -36,16 +36,16 @@ def querygithub(method, path, subdomain="api", data=None, json=True, headers=Non
         for k, v in headers.items():
             h[k] = v
     resp = requests.request(method, u, headers=h, data=data, json=json)
-    next = None
+    nextp = None
     for substr in resp.headers.get("link", "").split(","):
-        next = re.search(r'<(.+?)>; rel="next"', substr)
-        if next:
-            next = next.group(1)
+        nextp = re.search(r'<(.+?)>; rel="next"', substr)
+        if nextp:
+            nextp = nextp.group(1)
             break
     if not resp.status_code >= 200 or not resp.status_code < 300:
         raise RuntimeError(f"{resp.status_code}:{u}:{resp.content}")
     ret = resp.json() if method not in ["DELETE"] else resp
-    return next, ret
+    return nextp, ret
 
 
 RELID = querygithub("GET", f"releases/tags/{TAG}")[1]["id"]
@@ -53,9 +53,9 @@ RELID = querygithub("GET", f"releases/tags/{TAG}")[1]["id"]
 
 def iterassets():
     cache = []
-    next = f"releases/{RELID}/assets"
-    while next:
-        next, assets = querygithub("GET", next)
+    nextp = f"releases/{RELID}/assets"
+    while nextp:
+        nextp, assets = querygithub("GET", nextp)
         for asset in assets:
             if asset["name"] not in cache:
                 yield asset
@@ -63,7 +63,7 @@ def iterassets():
 
 
 def delasset(assetid):
-    return querygithub("DELETE",  f"releases/assets/{assetid}", json=None)[1]
+    return querygithub("DELETE", f"releases/assets/{assetid}", json=None)[1]
 
 
 def uploadasset(name, path):
@@ -86,14 +86,9 @@ def updaterelease(name, body, draft=False, prerelease=False):
 
 def getlocalpackages():
     local_packages = {}
-    for found_filename in os.listdir(REPOPATH):
-        if ".pkg." in found_filename:
-            found_pkgpath = os.path.join(REPOPATH, found_filename)
-            filename = found_filename.replace(":", ".")
+    for filename in os.listdir(REPOPATH):
+        if ".pkg." in filename:
             pkgpath = os.path.join(REPOPATH, filename)
-            if not found_pkgpath == pkgpath:
-                print(f"Renaming {found_pkgpath} -> {pkgpath}")
-                os.replace(found_pkgpath, pkgpath)
             if "-debug-" in filename:
                 print(f"Removing debug package {pkgpath}")
                 os.remove(pkgpath)
@@ -162,5 +157,5 @@ if __name__ == "__main__":
     localfiles = getlocalpackages()
     dbfiles = genrepo(*list(localfiles))
     for f in dbfiles:
-        localfiles[f] = -1 # force update db files
+        localfiles[f] = -1  # force update db files
     syncassets(**localfiles)
