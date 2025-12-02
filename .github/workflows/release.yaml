@@ -181,6 +181,7 @@ jobs:
           package: ${{ matrix.package }}
           skippgpcheck: true
           ignorearch: true
+          os: alarm-aarch64
       - name: prepare built packages to upload
         if: always()
         run: |
