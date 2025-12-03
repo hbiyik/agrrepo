@@ -12,6 +12,7 @@ source=("git+https://github.com/home-assistant/frontend.git")
 sha512sums=('SKIP')
 provides=(home-assistant-$_pkgname)
 conflicts=(home-assistant-$_pkgname)
+install=$pkgname.install
 
 _switchtag(){
   _tag=$(git tag -l --sort=creatordate | tail -1)
