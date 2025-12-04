@@ -1,9 +1,7 @@
-name: release alarm-aarch64
+name: release arch-x86_64
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 */4 * * *"
 
 permissions:
   contents: write
@@ -12,29 +10,13 @@ jobs:
   call:
     uses: ./.github/workflows/release.yaml
     with:
-      arch: alarm-aarch64
-      agrrunner: ubuntu-24.04-arm
+      arch: arch-x86_64
+      agrrunner: ubuntu-24.04
       packages: |
         [
           "gitweb-dlagent",
-          "linux-aarch64-rk3588-collabora-git",
-          "linux-aarch64-rk3588-collabora-git-headers",
-          "linux-aarch64-rockchip-bsp5.10-radxa-git",
-          "linux-aarch64-rockchip-bsp5.10-radxa-git-headers",
-          "linux-aarch64-rockchip-bsp6.1-armbian-git",
-          "linux-aarch64-rockchip-bsp6.1-armbian-git-headers",
-          "linux-aarch64-rockchip-bsp6.1-joshua-git",
-          "linux-aarch64-rockchip-bsp6.1-joshua-git-headers",
-          "linux-aarch64-rockchip-bsp6.1-boogie-git",
-          "linux-aarch64-rockchip-bsp6.1-boogie-headers-git",
-          "linux-aarch64-rockchip-bsp6.1-boogie-dtb-git",
-          "linux-aarch64-rockchip-bsp6.1-boogie-openvfd-git",
           "librga-multi",
           "acestream-media-bin",
-          "8852be-dkms-git",
-          "8852bu-dkms-git",
-          "iwlwifi-backport-dkms-git",
-          "r8125-dkms-git",
           "dri2to3-git",
           "bcm4335-firmware",
           "gl4es-git",

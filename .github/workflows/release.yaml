@@ -4,11 +4,15 @@ on:
   workflow_call:
     inputs:
       arch:
-        description: "Architecture tag (alarm-aarch64, alarm-armv7h)"
+        description: "Architecture tag"
         required: true
         type: string
       packages:
         description: "JSON array of packages to build"
+        required: true
+        type: string
+      agrrunner:
+        description: "Github runner image for AGR"
         required: true
         type: string
 
@@ -45,7 +49,7 @@ jobs:
 
   build:
     needs: getassets
-    runs-on: ubuntu-24.04-arm
+    runs-on: ${{ inputs.agrrunner }}
     continue-on-error: true
     strategy:
       matrix:
