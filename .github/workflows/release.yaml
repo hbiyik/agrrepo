@@ -11,10 +11,6 @@ on:
         description: "JSON array of packages to build"
         required: true
         type: string
-      agrrunner:
-        description: "Github runner image for AGR"
-        required: true
-        type: string
 
 jobs:
 
@@ -49,11 +45,18 @@ jobs:
 
   build:
     needs: getassets
-    runs-on: ${{ inputs.agrrunner }}
     continue-on-error: true
     strategy:
       matrix:
+        runner:
+          - ${{ (
+                inputs.arch == 'alarm-aarch64' || 
+                inputs.arch == 'alarm-armv7h'
+              ) && 'ubuntu-24.04-arm' || 'ubuntu-24.04'
+            }}
         package: ${{ fromJson(inputs.packages) }}
+
+    runs-on: ${{ matrix.runner }}
 
     steps:
       - uses: actions/download-artifact@v4
@@ -118,3 +121,4 @@ jobs:
         with:
           tag: ${{ inputs.arch }}
           reponame: boogie
+          pkgext: ${{ (inputs.arch == 'alarm-aarch64' || inputs.arch == 'alarm-armv7h') && 'tar.xz' || 'tar.zst' }}
