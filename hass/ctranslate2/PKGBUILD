@@ -7,7 +7,9 @@ unset 'makedepends[1]'
 # remove gcc14
 unset 'makedepends[2]'
 
+
 build(){
+  export CXXFLAGS="$CXXFLAGS -include cstdint"
   cmake -B build -S CTranslate2 \
     -DCMAKE_BUILD_TYPE='RelWithDebInfo' \
     -DCMAKE_INSTALL_PREFIX='/usr' \
