@@ -17,7 +17,6 @@ jobs:
         [
           "gitweb-dlagent",
           "librga-multi",
-          "acestream-media-bin",
           "dri2to3-git",
           "bcm4335-firmware",
           "gl4es-git",
