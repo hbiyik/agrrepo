@@ -3,24 +3,24 @@ import subprocess
 import requests
 import re
 import urllib3
-from packaging.version import Version
 
 REPOPATH = os.path.join(os.environ["GITHUB_WORKSPACE"], os.environ["REPOPATH"])
 OWNER, REPO = os.environ["REPOSITORY"].split("/")
 TAG = os.environ["TAG"]
 TOKEN = os.environ["TOKEN"]
 REPONAME = os.environ["REPONAME"]
+# TO-DO: parse this from makepkg.conf
 PKGEXT = os.environ["PKGEXT"]
 
 SERVER = "github.com"
 APIVER = "2022-11-28"
 
-VERSION_SEPS = [":", "+", "_", "@"]
 urllib3.disable_warnings()
+PKG_FILTERCHARS = {":": "."}
 
 
 def runprocess(*args, **kwargs):
-    proc = subprocess.Popen(*args, **kwargs)
+    proc = subprocess.Popen(args, **kwargs)
     proc.wait()
     if not proc.returncode == 0:
         cmd = " ".join(args)
@@ -68,13 +68,13 @@ def delasset(assetid):
 
 def uploadasset(name, path):
     # using curl here due to Python bug: https://github.com/python/cpython/issues/115627
-    runprocess(["curl", "-L", "-s", "-X" "POST", "-o", "/dev/null",
-                "-H", "Accept: application/vnd.github+json",
-                "-H", f"Authorization: Bearer {TOKEN}",
-                "-H", f"X-GitHub-Api-Version: {APIVER}",
-                "-H", "Content-Type: application/octet-stream",
-                f"https://uploads.{SERVER}/repos/{OWNER}/{REPO}/releases/{RELID}/assets?name={name}",
-                "--data-binary", f"@{path}"], cwd=REPOPATH)
+    runprocess("curl", "-L", "-s", "-X" "POST", "-o", "/dev/null",
+               "-H", "Accept: application/vnd.github+json",
+               "-H", f"Authorization: Bearer {TOKEN}",
+               "-H", f"X-GitHub-Api-Version: {APIVER}",
+               "-H", "Content-Type: application/octet-stream",
+               f"https://uploads.{SERVER}/repos/{OWNER}/{REPO}/releases/{RELID}/assets?name={name}",
+               "--data-binary", f"@{path}", cwd=REPOPATH)
 
 
 def updaterelease(name, body, draft=False, prerelease=False):
@@ -82,6 +82,28 @@ def updaterelease(name, body, draft=False, prerelease=False):
                                                            "body": body,
                                                            "draft": draft,
                                                            "prerelease": prerelease})[1]
+
+
+def fnameparse(fname):
+    fname = os.path.basename(fname)
+    parts = fname.split("-")
+    for c1, c2 in PKG_FILTERCHARS.items():
+        fname = fname.replace(c1, c2)
+    if len(parts) < 4:
+        return None, None, None
+    # pgname-[epoch:]pkgver-pkgrel-arch.ext
+    pkgrel = parts[-2]
+    if not pkgrel.isdigit():
+        return None, None, None
+    pkgrel = int(pkgrel)
+    pkgver = parts[-3]
+    pkgname = "-".join(parts[:-3])
+    return pkgname, f"{pkgver}.{pkgrel}"
+
+
+def isnewer(version1, version2):
+    stdout = subprocess.check_output(['vercmp', str(version1), str(version2)])
+    return int(stdout.strip()) > 0
 
 
 def getlocalpackages():
@@ -93,38 +115,28 @@ def getlocalpackages():
                 print(f"Removing debug package {pkgpath}")
                 os.remove(pkgpath)
                 continue
-            prename, _pkgext = filename.split(".pkg.")
-            splits = prename.split("-")
-            _arch = splits.pop(-1)
-            pkgrel = splits.pop(-1)
-            pkgver = splits.pop(-1)
-            pkgname = "-".join(splits)
+            pkgname, pkgversion = fnameparse(filename)
             pkgsize = os.stat(pkgpath).st_size
-            # make version compatible with packaging
-            versions = [pkgver, pkgrel]
-            for i in range(len(versions)):
-                for c in VERSION_SEPS:
-                    versions[i] = versions[i].replace(c, ".")
-                versions[i] = Version(''.join(c if c.isdigit() or c == "." else "0" for c in versions[i]))
-            pkgver, pkgrel = versions
             if pkgname not in local_packages:
-                local_packages[pkgname] = pkgver, pkgrel, filename, pkgpath, pkgsize
-            elif local_packages[pkgname][0] > pkgver or (local_packages[pkgname][0] == pkgver and local_packages[pkgname][1] > pkgrel):
-                print(f"Deleting local file {filename} in favor of {local_packages[pkgname][2]} because {local_packages[pkgname][0]}-{local_packages[pkgname][1]} >= {pkgver}-{pkgrel}")
-                os.remove(pkgpath)
+                local_packages[pkgname] = pkgversion, filename, pkgpath, pkgsize
+            elif isnewer(pkgversion, local_packages[pkgname][0]):
+                print(f"Deleting local file {local_packages[pkgname][1]} in favor of {filename} because {pkgversion} > {local_packages[pkgname][0]}")
+                print(f"::notice::Package update: {pkgname}: {local_packages[pkgname][0]} -> {pkgversion}")
+                os.remove(local_packages[pkgname][2])
+                local_packages[pkgname] = pkgversion, filename, pkgpath, pkgsize
             else:
-                print(f"Deleting local file {local_packages[pkgname][2]} in favor of {filename} because {pkgver}-{pkgrel} > {local_packages[pkgname][0]}-{local_packages[pkgname][1]}")
-                os.remove(local_packages[pkgname][3])
-                local_packages[pkgname] = pkgver, pkgrel, filename, pkgpath, pkgsize
+                print(f"Deleting local file {filename} in favor of {local_packages[pkgname][1]} because {local_packages[pkgname][0]} >= {pkgversion}")
+                print(f"::notice::Package update: {pkgname}: {pkgversion} -> {local_packages[pkgname][0]}")
+                os.remove(pkgpath)
     packages = {}
-    for _pkgname, [pkgver, pkgrel, filename, pkgpath, pkgsize] in local_packages.items():
+    for _pkgname, [pkgversion, filename, pkgpath, pkgsize] in local_packages.items():
         packages[filename] = pkgsize
     return packages
 
 
 def genrepo(*args):
     print(f"Generating Repo {REPONAME}")
-    runprocess(["repo-add", "-R", f"{REPONAME}.db.{PKGEXT}", *args], cwd=REPOPATH)
+    runprocess("repo-add", "-R", f"{REPONAME}.db.{PKGEXT}", *args, cwd=REPOPATH)
     return [f"{REPONAME}.db",
             f"{REPONAME}.db.{PKGEXT}",
             f"{REPONAME}.files",
@@ -147,6 +159,7 @@ def syncassets(**localfiles):
         localfiles.pop(asset["name"])
     for localfile, localsize in localfiles.items():
         print(f"Uploading new asset {localfile} with size {localsize}")
+        print(f"::notice:: Updated release: {localfile}")
         uploadasset(localfile, os.path.join(REPOPATH, localfile))
     print(f"Updating the release")
     updaterelease(TAG, "release")
