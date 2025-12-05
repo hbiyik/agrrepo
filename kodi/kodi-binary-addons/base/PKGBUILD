@@ -44,6 +44,7 @@ build() {
   unset DEBUG_CXXFLAGS
 
   export CMAKE_POLICY_VERSION_MINIMUM="3.5"
+  export CXXFLAGS="$CXXFLAGS -include cstdint"
 
   mkdir -p "$srcdir/addon-build/$_addonname"
   cd "$srcdir/addon-build/$_addonname"
