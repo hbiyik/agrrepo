@@ -3,7 +3,7 @@ name: release alarm-aarch64
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 */4 * * *"
+    - cron: "0 0,4,8,12,16,20 * * *"
 
 permissions:
   contents: write

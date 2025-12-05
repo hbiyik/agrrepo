@@ -2,7 +2,9 @@ name: release arch-x86_64
 
 on:
   workflow_dispatch:
-
+  schedule:
+    - cron: "0 2,6,10,14,18,22 * * *"
+    
 permissions:
   contents: write
 
