@@ -69,10 +69,6 @@
 	path = kernel/rockchip/linux-aarch64-rockchip-bsp6.1-armbian-git
 	url = https://github.com/7Ji-PKGBUILDs/linux-aarch64-rockchip-bsp6.1-armbian-git.git
 	branch = master
-[submodule "dolphin-emu"]
-	path = dolphin-emu
-	url = https://gitlab.archlinux.org/archlinux/packaging/packages/dolphin-emu.git
-	branch = main
 [submodule "agr"]
 	path = agr
 	url = https://github.com/hbiyik/agr.git
