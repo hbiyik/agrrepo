@@ -28,6 +28,7 @@ jobs:
         "ffmpeg-mpp",
         "libv4l-rkmpp-git",
         "v4l-utils-mpp",
+        "cubeb cubeb-docs",
         "agr-git",
         "mpv-mpp",
         "espeak-ng-git",
