@@ -18,15 +18,30 @@ agr sync --noconfirm
 agr build mpp-git 
 ```
 
-# Using it as binary repository:
+# Using as binary repository:
 
-Add below snippet to `/etc/pacman.conf` 
+There are 3 architectures that are built each 4 hours a day and updated to releases setion
+
+Archlinux ARMv8: tag: `alarm-aarch64`
+Archlinux ARMv7: tag: `alarm-armv7h`
+Archkinux x86_64: `arch-x86_64`
+
+For achlinux arm add snippet to `/etc/pacman.conf` 
 
 ```
 [boogie]
 Server = https://github.com/hbiyik/agrrepo/releases/download/alarm-$arch
 SigLevel = Never
 ```
+
+For achlinux add snippet to `/etc/pacman.conf` 
+
+```
+[boogie]
+Server = https://github.com/hbiyik/agrrepo/releases/download/arch-$arch
+SigLevel = Never
+```
+
 and use pacman to install the package of your choice
 
 ```
@@ -39,7 +54,3 @@ sudo pacman -S mpp-git
 Packages in this repo is patched dynamically with several community maintained other forks.
 After this patch process i do not do any audit of security, and the public audits of the main package is no more valid since it is patched against a community fork.
 Since there is no audit on those packages i also do not sign them. Please keep this in mind if you are concerned about security.
-
-# Build Status
-
-![testimg](https://github.com/hbiyik/agrrepo/releases/download/alarm-aarch64/gitweb-dlagent.svg)
