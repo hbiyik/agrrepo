@@ -5,8 +5,14 @@ inherit(){
 	_basepath=$(dirname $BASH_SOURCE)
 	echo "WARNING: Sourcing remote PKGBUILD at {$_pkgbuild}"
 	
-	# source the remote PKGBUILD
-	eval "$(curl -s -L $_pkgbuild)"
+	# cache for 5 minutes
+	_ts=($(date +%s))
+    _cachets=$((_ts / 300))
+    _cachefile=$(echo -n "{$_pkgbuild}{$_cachets}" | md5sum | head -c -4)
+    _cachefile="/tmp/${_cachefile}"
+    curl -L -s $_pkgbuild -o $_cachefile
+    # source the remote PKGBUILD
+	source $_cachefile
 	
 	# sync the localfiles
 	_skip_prefix=("http://" "https://" "ftp://" "file://" "scp://" "rsync://" "git+" "bzr+" "fossil+" "hg+" "svn+" "gitweb-dlagent://")
