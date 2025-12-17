@@ -2,5 +2,4 @@ eval "$(curl -s -L https://raw.githubusercontent.com/hbiyik/agrrepo/refs/heads/m
 inherit https://raw.githubusercontent.com/archlinux/aur/refs/heads/tvheadend-git
 pkgver=4.3.r2518.g7f9710c
 
-arch+=("aarch64" "armv7h")
 install=tvheadend.install
