@@ -21,7 +21,7 @@ jobs:
           "bcm4335-firmware",
           "gl4es-git",
           "kodi-mpp-git",
-          "mesa-panvk-git",
+          "mesa-git",
           "mesa-panfork-git",
           "mpp-git",
           "ffmpeg-mpp",
