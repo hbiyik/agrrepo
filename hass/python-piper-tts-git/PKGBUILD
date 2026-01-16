@@ -1,7 +1,7 @@
 pkgname=python-piper-tts-git
 _pkgname=piper1-gpl
-pkgver=r130.387ca06
-pkgrel=1
+pkgver=r137.32b95f8
+pkgrel=2
 pkgdesc="Fast and local neural text-to-speech engine"
 arch=('x86_64' 'aarch64' 'armv7h')
 url="https://github.com/OHF-Voice/piper1-gpl"

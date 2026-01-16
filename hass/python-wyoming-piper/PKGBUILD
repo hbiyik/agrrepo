@@ -1,8 +1,8 @@
 _pkgname=wyoming-piper
 pkgname=python-${_pkgname}
 pkgdesc="Wyoming Server for Piper"
-pkgver=1.6.3
-pkgrel=1
+pkgver=2.1.2
+pkgrel=2
 arch=(any)
 url="https://github.com/rhasspy/wyoming-piper"
 license=('MIT')

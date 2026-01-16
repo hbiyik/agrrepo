@@ -1,7 +1,7 @@
 _pkgname=wyoming-faster-whisper
 pkgname=python-$_pkgname
 pkgdesc="Wyoming Server for Faster Whisper"
-pkgver=2.5.0
+pkgver=3.0.2
 pkgrel=2
 arch=(any)
 url="https://github.com/rhasspy/wyoming-faster-whisper"
