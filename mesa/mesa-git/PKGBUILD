@@ -62,7 +62,6 @@ depends=(
     'libxcb'
     'glibc'
     'zlib'
-    'python'
     'xcb-util-keysyms'
     'libLLVM.so'
     'clang'
@@ -134,7 +133,7 @@ declare -A _crates=(
 )
 
 for _crate in "${!_crates[@]}"; do
-  source+=($_crate-${_crates[$_crate]}.tar.gz::https://crates.io/api/v1/crates/$_crate/${_crates[$_crate]}/download)
+  source+=($_crate-${_crates[$_crate]}.tar.gz::https://static.crates.io/crates/$_crate/${_crates[$_crate]}/download)
 done
 
 
