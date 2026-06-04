@@ -19,11 +19,11 @@ makedepends=('linux-aarch64-rockchip-bsp6.1-armbian-git-headers')
 
 _switchcore(){
   cd ${srcdir}/$_srcname
-  _core=$(git ls-remote -b --sort -version:refname | grep -oh core[0-9]* | head -n 1)
-  #_core=core96
+  #_core=$(git ls-remote -b --sort -version:refname | grep -oh core[0-9]* | head -n 1)
+  _core=core96
   git checkout release/${_core} --quiet
   git reset --hard --quiet
-  patch -s -N -p0 -i ../001-fix_timer_delete.patch
+  #patch -s -N -p0 -i ../001-fix_timer_delete.patch
   printf $_core
 }
 
