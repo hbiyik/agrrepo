@@ -3,25 +3,27 @@
 _pkgname=iwlwifi-backport
 _srcname=backport-iwlwifi
 pkgname=$_pkgname-dkms-git
-pkgver=core96.r11655
+pkgver=patching
 pkgrel=1
 pkgdesc="Backport of intel iwlwifi wireless drivers to linux LTS kernels"
 arch=('any')
 url="https://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/${_srcname}.git"
 license=('GPL')
 provides=(${pkgname}=${pkgver} ${_pkgname}-dkms=${pkgver})
-source=(git+$url dkms.conf)
+source=(git+$url dkms.conf 001-fix_timer_delete.patch)
 sha256sums=('SKIP'
+            'SKIP'
             'SKIP')
 depends=('dkms' 'python' 'bc')
 makedepends=('linux-aarch64-rockchip-bsp6.1-armbian-git-headers')
 
 _switchcore(){
   cd ${srcdir}/$_srcname
-  #_core=$(git ls-remote -b --sort -version:refname | grep -oh core[0-9]* | head -n 1)
-  _core=core96
+  _core=$(git ls-remote -b --sort -version:refname | grep -oh core[0-9]* | head -n 1)
+  #_core=core96
   git checkout release/${_core} --quiet
   git reset --hard --quiet
+  patch -s -N -p0 -i ../001-fix_timer_delete.patch
   printf $_core
 }
 

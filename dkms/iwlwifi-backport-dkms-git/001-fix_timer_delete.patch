@@ -1,0 +1,11 @@
+--- backport-include/linux/timer.h	2026-06-04 18:25:56.869397265 +0200
++++ backport-include/linux/timer_new.h	2026-06-04 21:05:14.911649034 +0200
+@@ -96,7 +96,7 @@
+ 
+ /* This was backported to 5.15.200, but we've seen it on some (non-vanilla) versions of 5.15.185
+  * Break vanilla 5.15.185 -> 5.15.200 since we're now at 5.15.202 and 5.15.202 does have those APIs. */
+-#if LINUX_VERSION_IS_LESS(6,2,0) &&	\
++#if LINUX_VERSION_IS_LESS(6,1,91) &&	\
+ 	!LINUX_VERSION_IN_RANGE(5,15,185, 5,16,0)
+ static inline int timer_delete(struct timer_list *timer)
+ {
