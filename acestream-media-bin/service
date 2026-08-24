@@ -1,9 +1,12 @@
 [Unit]
 Description=AceStream Media Service
-After=network.target
+After=network-online.target
+Wants=network-online.target
 
 [Service]
 ExecStart=/usr/bin/acestreamengine --client-console --bind-all --disable-sentry --live-cache-type=memory --vod-cache-type=memory --mem-cache-size=104857600 --log-stdout --access-token=acestream --http-port 6878
+Restart=on-failure
+RestartSec=5s
 
 [Install]
 WantedBy=multi-user.target

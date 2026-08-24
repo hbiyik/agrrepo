@@ -1,6 +1,8 @@
 post_install() {
   systemctl daemon-reload
-  systemctl try-restart acestream-media
+  if systemctl is-active --quiet acestream-media || systemctl is-failed --quiet acestream-media; then
+    systemctl restart acestream-media
+  fi
 }
 
 post_upgrade() {

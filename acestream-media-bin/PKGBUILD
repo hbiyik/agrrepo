@@ -3,9 +3,10 @@
 _srcname=docker-acestream-aceserve
 _bin=acestreamengine
 _pkgname=acestream-media
+_pkgver=3.2.17-fix
 pkgname=$_pkgname-bin
 pkgver=3.2.17
-pkgrel=1
+pkgrel=2
 pkgdesc='Acestream Media Service'
 arch=('aarch64' 'armv7h' 'x86_64')
 url='https://acestream.org'
@@ -14,12 +15,12 @@ provides=("acestream-engine")
 conflicts=("acestream-engine")
 makedepends=('unzip')
 options=(!strip !debug)
-source=("https://github.com/jopsis/$_srcname/archive/refs/tags/v$pkgver.tar.gz"
+source=("https://github.com/jopsis/$_srcname/archive/refs/tags/v$_pkgver.tar.gz"
         $_bin
         service)
-sha256sums=('2c654f246ba56a825669eabcfb74c4abfc8c293d102f9d143ce98c9f85601b40'
-            '2ffbc92ff1da3f16f6b88bbf4a0642ad3a5c54d88a890c3d9fb09d79d8cdbdc5'
-            'cc4578f068496025532bbff2ac5a4f2b07c6fab89a4fb96669322a11b3afa914')
+sha256sums=('fb0cbaeef11f9535887ae52ca28467fc47a6c96f21b59879059f7b802216988b'
+            '1189d2cc36db180c456b9b4fafaee63c9ef2dce97b7d2e2cb4234a88fa5b3f1f'
+            'c753dea4e3a1f19bc80282673ccdf0f8e8b8bce04a799e04370523fdc976e430')
 install=$_pkgname.install
 
 package() {
@@ -40,13 +41,13 @@ package() {
   install -d ${pkgdir}${_prefix}/proc
   install -d ${pkgdir}${_prefix}/run
 
-  unzip -o "${srcdir}/$_srcname-$pkgver/aceserve-$_arch/system.zip" -d ${pkgdir}${_prefix}
-  unzip -o "${srcdir}/$_srcname-$pkgver/aceserve-$_arch/ace-*.zip" -d ${pkgdir}${_prefix}/acestream/
+  unzip -o "${srcdir}/$_srcname-$_pkgver/aceserve-$_arch/system.zip" -d ${pkgdir}${_prefix}
+  unzip -o "${srcdir}/$_srcname-$_pkgver/aceserve-$_arch/ace-*.zip" -d ${pkgdir}${_prefix}/acestream/
   chmod -R +x ${pkgdir}${_prefix}/system/bin
   chmod -R +x ${pkgdir}${_prefix}/acestream/python/bin
-  cp -f ${srcdir}/$_srcname-$pkgver/aceserve-$_arch/main.py ${pkgdir}${_prefix}/acestream/
-  cp -f ${srcdir}/$_srcname-$pkgver/aceserve-$_arch/dnsproxyd.py ${pkgdir}${_prefix}/acestream/
-  cp -f ${srcdir}/$_srcname-$pkgver/aceserve-$_arch/app_bridge.py ${pkgdir}${_prefix}/acestream/
+  cp -f ${srcdir}/$_srcname-$_pkgver/aceserve-$_arch/main.py ${pkgdir}${_prefix}/acestream/
+  cp -f ${srcdir}/$_srcname-$_pkgver/aceserve-$_arch/dnsproxyd.py ${pkgdir}${_prefix}/acestream/
+  cp -f ${srcdir}/$_srcname-$_pkgver/aceserve-$_arch/app_bridge.py ${pkgdir}${_prefix}/acestream/
   
   install -Dm755 ${srcdir}/$_bin ${pkgdir}/usr/bin/$_bin
   install -Dm644 "service" "$pkgdir/usr/lib/systemd/system/$_pkgname.service"

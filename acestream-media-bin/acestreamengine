@@ -12,4 +12,5 @@ systemd-nspawn -D $ROOTFS \
  -E LD_LIBRARY_PATH=/system/lib64:/system/lib:/acestream/python/lib \
  -E PATH=/acestream/python/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
  --bind $STATEDIR:/dev/shm/.ACEStream \
+ --resolv-conf=copy-host \
   /acestream/python/bin/python /acestream/main.py $@
