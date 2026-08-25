@@ -2,7 +2,7 @@ eval "$(curl -s -L https://raw.githubusercontent.com/hbiyik/agrrepo/refs/heads/m
 inherit https://gitlab.archlinux.org/archlinux/packaging/packages/mpv/-/raw/main/
 
 _mpv_branch="mpp"
-_mpv_base="b22a4da1df113cee07ea49b49ac2737f30fc998e"
+_mpv_base="41f6a645068483470267271e1d09966ca3b9f413"
 
 arch=('x86_64' 'armv7h' 'aarch64')
 provides=('mpv' 'mpv-mpp')
