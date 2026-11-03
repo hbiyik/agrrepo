@@ -3,7 +3,7 @@
 _pkgname=iwlwifi-backport
 _srcname=backport-iwlwifi
 pkgname=$_pkgname-dkms-git
-pkgver=patching
+pkgver=core24.80.r12996
 pkgrel=1
 pkgdesc="Backport of intel iwlwifi wireless drivers to linux LTS kernels"
 arch=('any')
@@ -20,10 +20,10 @@ makedepends=('linux-aarch64-rockchip-bsp6.1-armbian-git-headers')
 _switchcore(){
   cd ${srcdir}/$_srcname
   #_core=$(git ls-remote -b --sort -version:refname | grep -oh core[0-9]* | head -n 1)
-  _core=core96
+  _core=core24.80
   git checkout release/${_core} --quiet
   git reset --hard --quiet
-  #patch -s -N -p0 -i ../001-fix_timer_delete.patch
+  patch -s -N -p0 -i ../001-fix_timer_delete.patch
   printf $_core
 }
 
