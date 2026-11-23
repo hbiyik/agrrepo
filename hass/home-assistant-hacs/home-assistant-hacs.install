@@ -1,7 +1,0 @@
-post_install() {
-  chown -R hass:hass "/var/lib/hass/custom_components"
-}
-
-post_upgrade() {
-  chown -R hass:hass "/var/lib/hass/custom_components"
-}
